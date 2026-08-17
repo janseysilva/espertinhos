@@ -148,7 +148,7 @@ class _EndGameResultDialogState extends State<EndGameResultDialog> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       final nav = Navigator.of(context);
                       final ads = context.read<AdsService>();
                       final music = context.read<MusicService>();
@@ -156,6 +156,7 @@ class _EndGameResultDialogState extends State<EndGameResultDialog> {
                       nav.pop();
                       nav.pop();
                       if (!adsRemoved) {
+                        await music.pauseForAd();
                         ads.showIfReady(onClosed: music.resumeIfNeeded);
                       }
                     },
