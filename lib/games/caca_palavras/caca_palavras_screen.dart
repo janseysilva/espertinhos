@@ -38,7 +38,7 @@ class _CacaPalavrasScreenState extends State<CacaPalavrasScreen> {
   void initState() {
     super.initState();
     _setup();
-    if (widget.age.level == 0) {
+    if (widget.age.level <= 1) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         if (context.read<MusicService>().muted) return;
@@ -49,7 +49,7 @@ class _CacaPalavrasScreenState extends State<CacaPalavrasScreen> {
 
   @override
   void dispose() {
-    if (widget.age.level == 0) context.read<TtsService>().stop();
+    if (widget.age.level <= 1) context.read<TtsService>().stop();
     super.dispose();
   }
 

@@ -27,7 +27,7 @@ class SequenciaScreen extends StatelessWidget {
       totalRounds: age.starsToAdvance,
       gridCrossAxisCount: palette.length <= 3 ? 3 : 4,
       optionAspectRatio: 1.0,
-      speakPrompts: age.level == 0,
+      speakPrompts: age.level <= 1,
       roundGenerator: (round) {
         final random = Random();
         final unitLen = unitLenRange.$1 +

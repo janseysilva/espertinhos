@@ -26,7 +26,7 @@ class AcheDiferenteScreen extends StatelessWidget {
       totalRounds: age.starsToAdvance,
       gridCrossAxisCount: crossAxisCount,
       optionAspectRatio: 1.0,
-      speakPrompts: age.level == 0,
+      speakPrompts: age.level <= 1,
       roundGenerator: (round) {
         final random = Random();
         final base = _iconPool[random.nextInt(_iconPool.length)];

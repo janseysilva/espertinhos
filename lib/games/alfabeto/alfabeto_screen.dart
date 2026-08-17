@@ -23,7 +23,7 @@ class AlfabetoScreen extends StatelessWidget {
       totalRounds: age.starsToAdvance,
       gridCrossAxisCount: 2,
       optionAspectRatio: 1.6,
-      speakPrompts: age.level == 0,
+      speakPrompts: age.level <= 1,
       roundGenerator: (round) {
         final random = Random();
         final targetLetter = _letters[random.nextInt(_letters.length)];

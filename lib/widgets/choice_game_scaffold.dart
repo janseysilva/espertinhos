@@ -23,7 +23,7 @@ class RoundData {
   final Widget prompt;
 
   /// Versão em texto puro do [prompt], falada em voz alta quando
-  /// [ChoiceGameScreen.speakPrompts] está ligado (faixa de 2 a 4 anos).
+  /// [ChoiceGameScreen.speakPrompts] está ligado (faixas de 2 a 4 e 5 a 6 anos).
   final String promptText;
   final List<ChoiceOption> options;
 }

@@ -24,7 +24,7 @@ class MatematicaScreen extends StatelessWidget {
       totalRounds: age.starsToAdvance,
       gridCrossAxisCount: 3,
       optionAspectRatio: 1.0,
-      speakPrompts: age.level == 0,
+      speakPrompts: age.level <= 1,
       roundGenerator: (round) {
         final random = Random();
         final isSubtraction = allowSubtraction && random.nextBool();

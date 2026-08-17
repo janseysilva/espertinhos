@@ -1,9 +1,8 @@
 import 'package:flutter_tts/flutter_tts.dart';
 
-/// Lê em voz alta as instruções de cada fase — usado só na faixa de 2 a 4
-/// anos, já que essas crianças ainda não sabem ler e algumas ainda não
-/// conhecem bem cores/objetos. Voz mais devagar e um pouco mais aguda,
-/// pensada pra criança pequena entender fácil.
+/// Lê em voz alta as instruções de cada fase — usado nas faixas de 2 a 4 e
+/// de 5 a 6 anos, já que essas crianças ainda não sabem ler bem. Voz mais
+/// devagar e um pouco mais aguda, pensada pra criança pequena entender fácil.
 class TtsService {
   final FlutterTts _tts = FlutterTts();
   bool _ready = false;
