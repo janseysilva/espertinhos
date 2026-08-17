@@ -49,9 +49,8 @@ class AppState extends ChangeNotifier {
 
   Future<void> recordGameResult(String gameId, int stars, int maxStars) async {
     await _profileService?.recordGameResult(gameId, stars);
-    final perfect = maxStars > 0 && stars >= maxStars;
     final age = ageGroup;
-    if (perfect && age != null) {
+    if (age != null && stars >= age.starsToAdvance) {
       final index = kGameOrder.indexOf(gameId);
       if (index >= 0 && index + 1 == unlockedPhase && unlockedPhase < kGameOrder.length) {
         unlockedPhase += 1;

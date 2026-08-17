@@ -1,9 +1,12 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/age_group.dart';
 import '../../models/scoring.dart';
+import '../../services/music_service.dart';
+import '../../services/tts_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/app_background.dart';
 import '../../widgets/end_game_dialog.dart';
@@ -14,6 +17,7 @@ import 'word_search_generator.dart';
 const _pool2a4 = ['GATO', 'SOL', 'LUA', 'PATO', 'MESA', 'BOLA', 'RATO', 'CASA'];
 const _pool5a6 = ['FLOR', 'LIVRO', 'PORTA', 'PEIXE', 'URSO', 'LEAO', 'NUVEM', 'CHUVA'];
 const _pool7a8 = ['ESTRELA', 'MONTANHA', 'JARDIM', 'FLORESTA', 'GIRASSOL', 'ELEFANTE', 'FAMILIA', 'CACHORRO'];
+const _cacaPalavrasPrompt = 'Toque na primeira e na última letra da palavra';
 
 class CacaPalavrasScreen extends StatefulWidget {
   const CacaPalavrasScreen({super.key, required this.age});
@@ -34,6 +38,19 @@ class _CacaPalavrasScreenState extends State<CacaPalavrasScreen> {
   void initState() {
     super.initState();
     _setup();
+    if (widget.age.level == 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        if (context.read<MusicService>().muted) return;
+        context.read<TtsService>().speak(_cacaPalavrasPrompt);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    if (widget.age.level == 0) context.read<TtsService>().stop();
+    super.dispose();
   }
 
   void _setup() {
@@ -147,7 +164,7 @@ class _CacaPalavrasScreenState extends State<CacaPalavrasScreen> {
                     GameTopBar(progressLabel: '$foundCount/${puzzle.words.length}'),
                     const SizedBox(height: 8),
                     const Text(
-                      'Toque na primeira e na última letra da palavra',
+                      _cacaPalavrasPrompt,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,

@@ -39,6 +39,7 @@ class OpostosScreen extends StatelessWidget {
       totalRounds: 8,
       gridCrossAxisCount: 2,
       optionAspectRatio: 1.4,
+      speakPrompts: age.level == 0,
       roundGenerator: (round) {
         final random = Random();
         final pairIndex = round % pairs.length;
@@ -62,6 +63,7 @@ class OpostosScreen extends StatelessWidget {
               Text(shown.text, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700)),
             ],
           ),
+          promptText: 'Qual é o contrário de ${shown.text}?',
           options: options
               .map(
                 (w) => ChoiceOption(

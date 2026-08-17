@@ -23,6 +23,7 @@ class AlfabetoScreen extends StatelessWidget {
       totalRounds: 8,
       gridCrossAxisCount: 2,
       optionAspectRatio: 1.6,
+      speakPrompts: age.level == 0,
       roundGenerator: (round) {
         final random = Random();
         final targetLetter = _letters[random.nextInt(_letters.length)];
@@ -59,6 +60,7 @@ class AlfabetoScreen extends StatelessWidget {
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
           ),
+          promptText: promptText,
           options: opts
               .map(
                 (l) => ChoiceOption(

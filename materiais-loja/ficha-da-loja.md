@@ -43,7 +43,7 @@ COM SEGURANÇA EM MENTE
 FEITO PARA CRESCER JUNTO
 Cada jogo se ajusta automaticamente à faixa etária escolhida (2 a 4, 5 a 6 ou 7 a 8 anos) na configuração inicial, ficando mais desafiador conforme a criança cresce.
 
-Cada partida ganha de 1 a 5 estrelas, guardadas num contador de conquistas — um jeito simples e divertido da criança acompanhar o próprio progresso. O progresso fica salvo automaticamente, então não se perde se o aparelho for trocado.
+Cada partida ganha de 1 a 8 estrelas, guardadas num contador de conquistas — um jeito simples e divertido da criança acompanhar o próprio progresso. O progresso fica salvo automaticamente, então não se perde se o aparelho for trocado.
 
 Espertinhos é gratuito e pensado para toda a família.
 ```

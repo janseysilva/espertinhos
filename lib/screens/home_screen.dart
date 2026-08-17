@@ -18,6 +18,7 @@ import '../games/sequencia/sequencia_screen.dart';
 import '../models/age_group.dart';
 import '../models/game_def.dart';
 import '../services/app_state.dart';
+import '../services/purchase_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/admin_lock_dialog.dart';
 import '../widgets/app_background.dart';
@@ -135,10 +136,25 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _buyRemoveAds(BuildContext context) async {
+    final purchases = context.read<PurchaseService>();
+    if (!purchases.productAvailable) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('A compra ainda não está disponível na loja. Tente de novo mais tarde!'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+    await purchases.buy();
+  }
+
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
     final age = appState.ageGroup ?? AgeGroup.faixa5a6;
+    final purchases = context.watch<PurchaseService>();
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -199,6 +215,26 @@ class HomeScreen extends StatelessWidget {
                         );
                       },
                     ),
+                    if (!purchases.adsRemoved)
+                      SquishyButton(
+                        color: Colors.white.withValues(alpha: 0.85),
+                        borderRadius: 999,
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        onTap: purchases.busy ? null : () => _buyRemoveAds(context),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text('🚫', style: TextStyle(fontSize: 14)),
+                            const SizedBox(width: 6),
+                            Text(
+                              purchases.busy
+                                  ? 'Comprando...'
+                                  : 'Remover anúncios${purchases.priceLabel.isNotEmpty ? ' · ${purchases.priceLabel}' : ''}',
+                              style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
                 const SizedBox(height: 14),
@@ -221,10 +257,10 @@ class HomeScreen extends StatelessWidget {
                         unlocked: unlocked,
                         onTap: () {
                           if (!unlocked) {
-                            final prevMax = i > 0 ? kGames[i - 1].maxStars : game.maxStars;
+                            final needed = age.starsToAdvance;
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('🔒 Consiga as $prevMax estrelas da fase anterior pra desbloquear essa!'),
+                                content: Text('🔒 Consiga $needed estrelas na fase anterior pra desbloquear essa!'),
                                 behavior: SnackBarBehavior.floating,
                               ),
                             );

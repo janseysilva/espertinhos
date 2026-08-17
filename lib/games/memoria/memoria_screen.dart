@@ -1,12 +1,17 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/age_group.dart';
 import '../../models/scoring.dart';
+import '../../services/music_service.dart';
+import '../../services/tts_service.dart';
 import '../../widgets/app_background.dart';
 import '../../widgets/end_game_dialog.dart';
 import '../../widgets/game_top_bar.dart';
+
+const _memoriaPrompt = 'Toque em 2 cartas para achar os pares iguais';
 
 const _animalPool = [
   '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼',
@@ -36,6 +41,19 @@ class _MemoriaScreenState extends State<MemoriaScreen> {
     super.initState();
     pairCount = switch (widget.age.level) { 0 => 4, 1 => 6, _ => 10 };
     _setup();
+    if (widget.age.level == 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        if (context.read<MusicService>().muted) return;
+        context.read<TtsService>().speak(_memoriaPrompt);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    if (widget.age.level == 0) context.read<TtsService>().stop();
+    super.dispose();
   }
 
   void _setup() {
@@ -70,7 +88,11 @@ class _MemoriaScreenState extends State<MemoriaScreen> {
         locked = false;
       });
       if (matched.length == cards.length) {
-        final stars = starsFromEfficiency(moves, pairCount);
+        // pairCount é o mínimo teórico (zero erros), impossível na prática
+        // já que as cartas ficam escondidas até serem viradas pela 1ª vez.
+        // Uma meta alcançável de verdade fica em torno de 1,5x os pares.
+        final achievableGoal = (pairCount * 1.5).ceil();
+        final stars = starsFromEfficiency(moves, achievableGoal);
         if (!mounted) return;
         await showEndGameDialog(
           context,
@@ -104,7 +126,7 @@ class _MemoriaScreenState extends State<MemoriaScreen> {
                 GameTopBar(progressLabel: 'Jogadas: $moves'),
                 const SizedBox(height: 12),
                 const Text(
-                  'Toque em 2 cartas para achar os pares iguais',
+                  _memoriaPrompt,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,

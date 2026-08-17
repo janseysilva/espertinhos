@@ -27,6 +27,7 @@ class SequenciaScreen extends StatelessWidget {
       totalRounds: 8,
       gridCrossAxisCount: palette.length <= 3 ? 3 : 4,
       optionAspectRatio: 1.0,
+      speakPrompts: age.level == 0,
       roundGenerator: (round) {
         final random = Random();
         final unitLen = unitLenRange.$1 +
@@ -58,6 +59,7 @@ class SequenciaScreen extends StatelessWidget {
               ),
             ],
           ),
+          promptText: 'Qual cor vem a seguir?',
           options: options
               .map((c) => ChoiceOption(isCorrect: c == next, child: _Dot(color: c, size: 48)))
               .toList(),

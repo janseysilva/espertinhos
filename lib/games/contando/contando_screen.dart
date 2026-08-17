@@ -26,6 +26,7 @@ class ContandoScreen extends StatelessWidget {
       totalRounds: 8,
       gridCrossAxisCount: 3,
       optionAspectRatio: 1.0,
+      speakPrompts: age.level == 0,
       roundGenerator: (round) {
         final random = Random();
         final target = minN + random.nextInt(maxN - minN + 1);
@@ -58,6 +59,7 @@ class ContandoScreen extends StatelessWidget {
               ),
             ],
           ),
+          promptText: 'Quantos você vê?',
           options: choices
               .map(
                 (n) => ChoiceOption(

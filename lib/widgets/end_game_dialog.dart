@@ -4,7 +4,9 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../services/ads_service.dart';
 import '../services/app_state.dart';
+import '../services/purchase_service.dart';
 import '../theme/app_theme.dart';
 import 'mascot.dart';
 import 'squishy_button.dart';
@@ -143,8 +145,11 @@ class _EndGameResultDialogState extends State<EndGameResultDialog> {
                     ),
                     onPressed: () {
                       final nav = Navigator.of(context);
+                      final ads = context.read<AdsService>();
+                      final adsRemoved = context.read<PurchaseService>().adsRemoved;
                       nav.pop();
                       nav.pop();
+                      if (!adsRemoved) ads.showIfReady();
                     },
                     child: const Text('MENU', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                   ),

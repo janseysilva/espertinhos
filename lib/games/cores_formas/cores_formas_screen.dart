@@ -16,6 +16,10 @@ const _shapeNames = {
   _Shape.losango: 'losango',
 };
 
+// "estrela" é a única forma feminina da lista ("na estrela"); as demais
+// são masculinas ("no círculo", "no quadrado" etc).
+const _feminineShapes = {_Shape.estrela};
+
 const _colors = <String, Color>{
   'vermelho': Color(0xFFEF5350),
   'azul': Color(0xFF2196F3),
@@ -23,6 +27,15 @@ const _colors = <String, Color>{
   'verde': Color(0xFF66BB6A),
   'roxo': Color(0xFF7C4DFF),
   'laranja': Color(0xFFFF7043),
+};
+
+// Forma feminina de cada cor, pra concordar com formas femininas (ex:
+// "estrela vermelha"). Cores sem entrada aqui (azul/verde/laranja) são
+// invariáveis, o nome já serve pros dois gêneros.
+const _feminineColorNames = {
+  'vermelho': 'vermelha',
+  'amarelo': 'amarela',
+  'roxo': 'roxa',
 };
 
 class CoresFormasScreen extends StatelessWidget {
@@ -44,6 +57,7 @@ class CoresFormasScreen extends StatelessWidget {
       totalRounds: 8,
       gridCrossAxisCount: optionCount <= 4 ? 2 : 3,
       optionAspectRatio: 1.1,
+      speakPrompts: age.level == 0,
       roundGenerator: (round) {
         final random = Random();
         final targetShape = shapes[random.nextInt(shapes.length)];
@@ -57,12 +71,17 @@ class CoresFormasScreen extends StatelessWidget {
         }
         final options = combos.toList()..shuffle(random);
 
+        final isFeminine = _feminineShapes.contains(targetShape);
+        final article = isFeminine ? 'na' : 'no';
+        final colorLabel = isFeminine ? (_feminineColorNames[targetColor] ?? targetColor) : targetColor;
+        final text = 'Toque $article ${_shapeNames[targetShape]} $colorLabel';
         return RoundData(
           prompt: Text(
-            'Toque no ${_shapeNames[targetShape]} $targetColor',
+            text,
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
           ),
+          promptText: text,
           options: options
               .map(
                 (combo) => ChoiceOption(

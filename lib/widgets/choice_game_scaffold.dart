@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../models/scoring.dart';
+import '../services/music_service.dart';
+import '../services/tts_service.dart';
 import 'app_background.dart';
 import 'end_game_dialog.dart';
 import 'feedback_flash.dart';
@@ -15,9 +18,13 @@ class ChoiceOption {
 }
 
 class RoundData {
-  const RoundData({required this.prompt, required this.options});
+  const RoundData({required this.prompt, required this.promptText, required this.options});
 
   final Widget prompt;
+
+  /// Versão em texto puro do [prompt], falada em voz alta quando
+  /// [ChoiceGameScreen.speakPrompts] está ligado (faixa de 2 a 4 anos).
+  final String promptText;
   final List<ChoiceOption> options;
 }
 
@@ -30,6 +37,7 @@ class ChoiceGameScreen extends StatefulWidget {
     required this.roundGenerator,
     this.gridCrossAxisCount = 2,
     this.optionAspectRatio = 1.3,
+    this.speakPrompts = false,
   });
 
   final String gameId;
@@ -38,6 +46,10 @@ class ChoiceGameScreen extends StatefulWidget {
   final RoundData Function(int roundIndex) roundGenerator;
   final int gridCrossAxisCount;
   final double optionAspectRatio;
+
+  /// Lê o comando de cada rodada em voz alta — pensado pra faixa de 2 a 4
+  /// anos, que ainda não sabe ler.
+  final bool speakPrompts;
 
   @override
   State<ChoiceGameScreen> createState() => _ChoiceGameScreenState();
@@ -54,6 +66,21 @@ class _ChoiceGameScreenState extends State<ChoiceGameScreen> {
   void initState() {
     super.initState();
     current = widget.roundGenerator(0);
+    if (widget.speakPrompts) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _speakCurrentPrompt());
+    }
+  }
+
+  void _speakCurrentPrompt() {
+    if (!widget.speakPrompts || !mounted) return;
+    if (context.read<MusicService>().muted) return;
+    context.read<TtsService>().speak(current.promptText);
+  }
+
+  @override
+  void dispose() {
+    if (widget.speakPrompts) context.read<TtsService>().stop();
+    super.dispose();
   }
 
   void _restart() {
@@ -64,6 +91,7 @@ class _ChoiceGameScreenState extends State<ChoiceGameScreen> {
       locked = false;
       current = widget.roundGenerator(0);
     });
+    _speakCurrentPrompt();
   }
 
   Future<void> _answer(bool correct) async {
@@ -90,6 +118,7 @@ class _ChoiceGameScreenState extends State<ChoiceGameScreen> {
         feedback = null;
         locked = false;
       });
+      _speakCurrentPrompt();
     }
   }
 

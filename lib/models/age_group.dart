@@ -26,6 +26,14 @@ extension AgeGroupX on AgeGroup {
         AgeGroup.faixa7a8 => 2,
       };
 
+  /// Quantas estrelas (de um máximo de 8) são necessárias pra desbloquear a
+  /// próxima fase. Crianças menores não precisam de nota perfeita.
+  int get starsToAdvance => switch (this) {
+        AgeGroup.faixa2a4 => 5,
+        AgeGroup.faixa5a6 => 6,
+        AgeGroup.faixa7a8 => 8,
+      };
+
   static AgeGroup fromId(String id) => AgeGroup.values.firstWhere(
         (e) => e.id == id,
         orElse: () => AgeGroup.faixa5a6,

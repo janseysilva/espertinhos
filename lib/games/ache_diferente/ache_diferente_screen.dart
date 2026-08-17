@@ -26,6 +26,7 @@ class AcheDiferenteScreen extends StatelessWidget {
       totalRounds: 8,
       gridCrossAxisCount: crossAxisCount,
       optionAspectRatio: 1.0,
+      speakPrompts: age.level == 0,
       roundGenerator: (round) {
         final random = Random();
         final base = _iconPool[random.nextInt(_iconPool.length)];
@@ -41,6 +42,7 @@ class AcheDiferenteScreen extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
           ),
+          promptText: 'Toque no que é diferente',
           options: List.generate(
             gridSize,
             (i) => ChoiceOption(

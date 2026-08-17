@@ -20,6 +20,7 @@ class MaiorMenorScreen extends StatelessWidget {
       totalRounds: 8,
       gridCrossAxisCount: 2,
       optionAspectRatio: 1.3,
+      speakPrompts: age.level == 0,
       roundGenerator: (round) {
         final random = Random();
         final askBigger = round.isEven;
@@ -30,12 +31,14 @@ class MaiorMenorScreen extends StatelessWidget {
         }
         final correct = askBigger ? max(a, b) : min(a, b);
 
+        final text = askBigger ? 'Toque no número MAIOR' : 'Toque no número MENOR';
         return RoundData(
           prompt: Text(
-            askBigger ? 'Toque no número MAIOR' : 'Toque no número MENOR',
+            text,
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
           ),
+          promptText: text,
           options: [a, b]
               .map(
                 (n) => ChoiceOption(

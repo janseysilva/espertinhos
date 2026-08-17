@@ -24,6 +24,7 @@ class MatematicaScreen extends StatelessWidget {
       totalRounds: 8,
       gridCrossAxisCount: 3,
       optionAspectRatio: 1.0,
+      speakPrompts: age.level == 0,
       roundGenerator: (round) {
         final random = Random();
         final isSubtraction = allowSubtraction && random.nextBool();
@@ -69,6 +70,7 @@ class MatematicaScreen extends StatelessWidget {
 
         return RoundData(
           prompt: prompt,
+          promptText: 'Quanto é $a ${isSubtraction ? "menos" : "mais"} $b?',
           options: choices
               .map(
                 (n) => ChoiceOption(
