@@ -24,7 +24,7 @@ class SequenciaScreen extends StatelessWidget {
     return ChoiceGameScreen(
       gameId: 'sequencia',
       title: 'Sequência',
-      totalRounds: 8,
+      totalRounds: age.starsToAdvance,
       gridCrossAxisCount: palette.length <= 3 ? 3 : 4,
       optionAspectRatio: 1.0,
       speakPrompts: age.level == 0,

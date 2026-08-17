@@ -36,7 +36,7 @@ class OpostosScreen extends StatelessWidget {
     return ChoiceGameScreen(
       gameId: 'opostos',
       title: 'Opostos',
-      totalRounds: 8,
+      totalRounds: age.starsToAdvance,
       gridCrossAxisCount: 2,
       optionAspectRatio: 1.4,
       speakPrompts: age.level == 0,

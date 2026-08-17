@@ -23,7 +23,7 @@ class ContandoScreen extends StatelessWidget {
     return ChoiceGameScreen(
       gameId: 'contando',
       title: 'Contando',
-      totalRounds: 8,
+      totalRounds: age.starsToAdvance,
       gridCrossAxisCount: 3,
       optionAspectRatio: 1.0,
       speakPrompts: age.level == 0,

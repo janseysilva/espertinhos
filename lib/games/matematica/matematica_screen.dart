@@ -21,7 +21,7 @@ class MatematicaScreen extends StatelessWidget {
     return ChoiceGameScreen(
       gameId: 'matematica',
       title: 'Matemática',
-      totalRounds: 8,
+      totalRounds: age.starsToAdvance,
       gridCrossAxisCount: 3,
       optionAspectRatio: 1.0,
       speakPrompts: age.level == 0,

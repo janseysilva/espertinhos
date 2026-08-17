@@ -20,7 +20,7 @@ class AlfabetoScreen extends StatelessWidget {
     return ChoiceGameScreen(
       gameId: 'alfabeto',
       title: 'Alfabeto',
-      totalRounds: 8,
+      totalRounds: age.starsToAdvance,
       gridCrossAxisCount: 2,
       optionAspectRatio: 1.6,
       speakPrompts: age.level == 0,

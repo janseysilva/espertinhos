@@ -23,7 +23,7 @@ class AcheDiferenteScreen extends StatelessWidget {
     return ChoiceGameScreen(
       gameId: 'ache_diferente',
       title: 'Ache o Diferente',
-      totalRounds: 8,
+      totalRounds: age.starsToAdvance,
       gridCrossAxisCount: crossAxisCount,
       optionAspectRatio: 1.0,
       speakPrompts: age.level == 0,

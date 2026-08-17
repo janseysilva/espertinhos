@@ -54,7 +54,7 @@ class CoresFormasScreen extends StatelessWidget {
     return ChoiceGameScreen(
       gameId: 'cores_formas',
       title: 'Cores e Formas',
-      totalRounds: 8,
+      totalRounds: age.starsToAdvance,
       gridCrossAxisCount: optionCount <= 4 ? 2 : 3,
       optionAspectRatio: 1.1,
       speakPrompts: age.level == 0,

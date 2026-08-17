@@ -17,7 +17,7 @@ class MaiorMenorScreen extends StatelessWidget {
     return ChoiceGameScreen(
       gameId: 'maior_menor',
       title: 'Maior ou Menor',
-      totalRounds: 8,
+      totalRounds: age.starsToAdvance,
       gridCrossAxisCount: 2,
       optionAspectRatio: 1.3,
       speakPrompts: age.level == 0,
