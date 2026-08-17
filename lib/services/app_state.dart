@@ -48,15 +48,25 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> recordGameResult(String gameId, int stars, int maxStars) async {
-    await _profileService?.recordGameResult(gameId, stars);
-    final age = ageGroup;
-    if (age != null && stars >= age.starsToAdvance) {
-      final index = kGameOrder.indexOf(gameId);
-      if (index >= 0 && index + 1 == unlockedPhase && unlockedPhase < kGameOrder.length) {
-        unlockedPhase += 1;
-        notifyListeners();
-        await _profileService?.setUnlockedPhase(age.id, unlockedPhase);
+    try {
+      await _profileService?.recordGameResult(gameId, stars);
+      final age = ageGroup;
+      if (age != null && stars >= age.starsToAdvance) {
+        final index = kGameOrder.indexOf(gameId);
+        if (index >= 0 && index + 1 == unlockedPhase && unlockedPhase < kGameOrder.length) {
+          final newPhase = unlockedPhase + 1;
+          // Salva primeiro, só atualiza a tela depois de confirmar que
+          // gravou — evita a criança ver a fase liberada e, se fechar o
+          // app rápido demais ou sem internet, o progresso não ter sido
+          // salvo de verdade.
+          await _profileService?.setUnlockedPhase(age.id, newPhase);
+          unlockedPhase = newPhase;
+          notifyListeners();
+        }
       }
+    } catch (_) {
+      // Sem internet no momento — a fase não desbloqueia agora, mas o
+      // resto do fluxo (caixa de resultado etc.) continua funcionando.
     }
   }
 

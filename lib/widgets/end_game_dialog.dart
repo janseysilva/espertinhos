@@ -18,7 +18,11 @@ Future<void> showEndGameDialog(
   required int maxStars,
   required VoidCallback onReplay,
 }) async {
-  context.read<AppState>().recordGameResult(gameId, stars, maxStars);
+  // Espera o progresso salvar ANTES de abrir a caixa de resultado — sem
+  // isso, a criança podia fechar o app rápido demais e a fase desbloqueada
+  // não chegava a ser salva de verdade.
+  await context.read<AppState>().recordGameResult(gameId, stars, maxStars);
+  if (!context.mounted) return;
   await showDialog<void>(
     context: context,
     barrierDismissible: false,
