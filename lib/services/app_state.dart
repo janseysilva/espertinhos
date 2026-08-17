@@ -48,8 +48,19 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> recordGameResult(String gameId, int stars, int maxStars) async {
+    // Cada gravação tem seu próprio try/catch: `recordGameResult` (estrelas)
+    // usa uma transação do Firestore, que PRECISA de internet no momento pra
+    // funcionar (diferente de um `.set()` normal, que funciona offline e
+    // sincroniza depois). Se essa parte falhar (sem internet bem na hora),
+    // não pode impedir a tentativa de desbloquear a fase — antes as duas
+    // gravações estavam no mesmo bloco, e uma falha na primeira cancelava
+    // a segunda silenciosamente, mesmo com internet boa o bastante pro
+    // desbloqueio funcionar.
     try {
       await _profileService?.recordGameResult(gameId, stars);
+    } catch (_) {}
+
+    try {
       final age = ageGroup;
       if (age != null && stars >= age.starsToAdvance) {
         final index = kGameOrder.indexOf(gameId);

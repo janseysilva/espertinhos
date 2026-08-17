@@ -90,8 +90,10 @@ class _MemoriaScreenState extends State<MemoriaScreen> {
       if (matched.length == cards.length) {
         // pairCount é o mínimo teórico (zero erros), impossível na prática
         // já que as cartas ficam escondidas até serem viradas pela 1ª vez.
-        // Uma meta alcançável de verdade fica em torno de 1,5x os pares.
-        final achievableGoal = (pairCount * 1.5).ceil();
+        // Quanto menor a criança, mais limitada é a memória de curto prazo,
+        // então a margem de erro tolerada cresce pra faixa mais nova.
+        final multiplier = switch (widget.age.level) { 0 => 3.0, 1 => 2.0, _ => 1.5 };
+        final achievableGoal = (pairCount * multiplier).ceil();
         final stars = starsFromEfficiency(moves, achievableGoal);
         if (!mounted) return;
         await showEndGameDialog(

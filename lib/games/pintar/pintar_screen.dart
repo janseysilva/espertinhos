@@ -43,11 +43,15 @@ class _PintarScreenState extends State<PintarScreen> {
   }
 
   void _finish() {
+    // Pintar não tem "erro" possível (é livre), então sempre dá nota
+    // máxima — mas a nota máxima acompanha a exigência da faixa etária,
+    // pra bater com o "X de X estrelas" mostrado nos outros jogos.
+    final stars = widget.age.starsToAdvance;
     showEndGameDialog(
       context,
       gameId: 'pintar',
-      stars: 8,
-      maxStars: 8,
+      stars: stars,
+      maxStars: stars,
       onReplay: () => setState(() => selected = null),
     );
   }
