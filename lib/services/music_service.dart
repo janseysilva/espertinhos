@@ -49,17 +49,18 @@ class MusicService extends ChangeNotifier {
 
   /// Chamado depois que um anúncio de tela cheia fecha — o anúncio toma
   /// o "foco de áudio" do aparelho enquanto está na tela, o que pausa a
-  /// música sozinho no nível do sistema. Sem isso, a música não voltava
-  /// a tocar depois do anúncio.
+  /// música sozinho no nível do sistema sem avisar o plugin (o `state`
+  /// interno continua marcado como "tocando" mesmo com o som já parado),
+  /// então só chamar `resume()` quando `state != playing` não funcionava.
+  /// Reinicia a faixa sempre, com uma pequena espera pro Android acabar
+  /// de devolver o foco de áudio pro app.
   Future<void> resumeIfNeeded() async {
     if (muted || !_started) return;
+    await Future.delayed(const Duration(milliseconds: 400));
     try {
-      if (_player.state != PlayerState.playing) {
-        await _player.resume();
-      }
-    } catch (_) {
-      await _playCurrent();
-    }
+      await _player.stop();
+    } catch (_) {}
+    await _playCurrent();
   }
 
   Future<void> toggleMute() async {
