@@ -90,12 +90,15 @@ class _QuebraCabecaScreenState extends State<QuebraCabecaScreen> {
 
     final solved = List.generate(pieceOrder.length, (i) => i == pieceOrder[i]).every((v) => v);
     if (solved) {
-      final stars = starsFromEfficiency(swaps, minMoves == 0 ? 1 : minMoves);
+      // A nota máxima acompanha a exigência da faixa etária (5/6/8), pra
+      // bater com o "X de X estrelas" mostrado no resto do app.
+      final maxStars = widget.age.starsToAdvance;
+      final stars = min(starsFromEfficiency(swaps, minMoves == 0 ? 1 : minMoves), maxStars);
       await showEndGameDialog(
         context,
         gameId: 'quebra_cabeca',
         stars: stars,
-        maxStars: 8,
+        maxStars: maxStars,
         onReplay: _restart,
       );
     }

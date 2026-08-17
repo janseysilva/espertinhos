@@ -34,9 +34,21 @@ class AppState extends ChangeNotifier {
   /// faixa, sem herdar o que foi desbloqueado em outra.
   Future<void> setAgeGroup(AgeGroup age) async {
     ageGroup = age;
-    unlockedPhase = await _profileService?.loadUnlockedPhase(age.id) ?? 1;
     notifyListeners();
-    await _profileService?.setAgeGroup(age);
+    // Salva a escolha da faixa PRIMEIRO (gravação simples, funciona
+    // offline) — só depois tenta carregar o progresso salvo daquela faixa.
+    // Um timeout evita que uma conexão ruim trave a troca de faixa
+    // indefinidamente; se der timeout, cai pro padrão (fase 1).
+    try {
+      await _profileService?.setAgeGroup(age).timeout(const Duration(seconds: 6));
+    } catch (_) {}
+    try {
+      unlockedPhase =
+          await _profileService?.loadUnlockedPhase(age.id).timeout(const Duration(seconds: 6)) ?? 1;
+    } catch (_) {
+      unlockedPhase = 1;
+    }
+    notifyListeners();
   }
 
   /// Um jogo (fase) só fica jogável se seu índice em [kGameOrder] for menor
@@ -48,29 +60,21 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> recordGameResult(String gameId, int stars, int maxStars) async {
-    // Cada gravação tem seu próprio try/catch: `recordGameResult` (estrelas)
-    // usa uma transação do Firestore, que PRECISA de internet no momento pra
-    // funcionar (diferente de um `.set()` normal, que funciona offline e
-    // sincroniza depois). Se essa parte falhar (sem internet bem na hora),
-    // não pode impedir a tentativa de desbloquear a fase — antes as duas
-    // gravações estavam no mesmo bloco, e uma falha na primeira cancelava
-    // a segunda silenciosamente, mesmo com internet boa o bastante pro
-    // desbloqueio funcionar.
-    try {
-      await _profileService?.recordGameResult(gameId, stars);
-    } catch (_) {}
-
+    // A fase liberada é salva PRIMEIRO — é a parte mais importante e usa
+    // uma gravação simples (`.set()`, funciona offline, resolve rápido).
+    // A pontuação (mais abaixo) usa uma TRANSAÇÃO do Firestore, que exige
+    // internet de verdade e pode ficar tentando de novo por vários segundos
+    // se a conexão estiver ruim — se ela viesse primeiro e a criança
+    // fechasse o app nesse meio tempo, o desbloqueio da fase nunca chegava
+    // a ser tentado. Cada gravação tem timeout próprio, então uma conexão
+    // ruim não trava o app esperando pra sempre.
     try {
       final age = ageGroup;
       if (age != null && stars >= age.starsToAdvance) {
         final index = kGameOrder.indexOf(gameId);
         if (index >= 0 && index + 1 == unlockedPhase && unlockedPhase < kGameOrder.length) {
           final newPhase = unlockedPhase + 1;
-          // Salva primeiro, só atualiza a tela depois de confirmar que
-          // gravou — evita a criança ver a fase liberada e, se fechar o
-          // app rápido demais ou sem internet, o progresso não ter sido
-          // salvo de verdade.
-          await _profileService?.setUnlockedPhase(age.id, newPhase);
+          await _profileService?.setUnlockedPhase(age.id, newPhase).timeout(const Duration(seconds: 6));
           unlockedPhase = newPhase;
           notifyListeners();
         }
@@ -79,6 +83,10 @@ class AppState extends ChangeNotifier {
       // Sem internet no momento — a fase não desbloqueia agora, mas o
       // resto do fluxo (caixa de resultado etc.) continua funcionando.
     }
+
+    try {
+      await _profileService?.recordGameResult(gameId, stars).timeout(const Duration(seconds: 6));
+    } catch (_) {}
   }
 
   Stream<int> get lifetimeStarsStream =>

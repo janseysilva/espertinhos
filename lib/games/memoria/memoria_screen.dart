@@ -94,13 +94,16 @@ class _MemoriaScreenState extends State<MemoriaScreen> {
         // então a margem de erro tolerada cresce pra faixa mais nova.
         final multiplier = switch (widget.age.level) { 0 => 3.0, 1 => 2.0, _ => 1.5 };
         final achievableGoal = (pairCount * multiplier).ceil();
-        final stars = starsFromEfficiency(moves, achievableGoal);
+        // A nota máxima acompanha a exigência da faixa etária (5/6/8), pra
+        // bater com o "X de X estrelas" mostrado no resto do app.
+        final maxStars = widget.age.starsToAdvance;
+        final stars = min(starsFromEfficiency(moves, achievableGoal), maxStars);
         if (!mounted) return;
         await showEndGameDialog(
           context,
           gameId: 'memoria',
           stars: stars,
-          maxStars: 8,
+          maxStars: maxStars,
           onReplay: _restart,
         );
       }

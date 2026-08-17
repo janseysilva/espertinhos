@@ -125,8 +125,11 @@ class _CacaPalavrasScreenState extends State<CacaPalavrasScreen> {
       if (!mounted) return;
       setState(() => feedback = null);
       if (puzzle.words.every((w) => w.found)) {
-        final stars = starsFromMistakes(mistakes);
-        await showEndGameDialog(context, gameId: 'caca_palavras', stars: stars, maxStars: 8, onReplay: _restart);
+        // A nota máxima acompanha a exigência da faixa etária (5/6/8), pra
+        // bater com o "X de X estrelas" mostrado no resto do app.
+        final maxStars = widget.age.starsToAdvance;
+        final stars = min(starsFromMistakes(mistakes), maxStars);
+        await showEndGameDialog(context, gameId: 'caca_palavras', stars: stars, maxStars: maxStars, onReplay: _restart);
       }
     } else {
       mistakes++;

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 /// ID DE TESTE oficial do Google (intersticial, Android). Trocar pelo ID
@@ -46,7 +47,10 @@ class AdsService {
 
   /// Mostra o anúncio se já estiver carregado; se não, apenas ignora
   /// silenciosamente (não vale a pena travar a criança esperando).
-  void showIfReady() {
+  /// [onClosed] é chamado quando o anúncio fecha (ou falha em abrir) — usado
+  /// pra retomar a música de fundo, já que o anúncio toma o foco de áudio
+  /// do aparelho enquanto está na tela.
+  void showIfReady({VoidCallback? onClosed}) {
     final ad = _interstitialAd;
     if (ad == null) {
       _loadInterstitial();
@@ -57,11 +61,13 @@ class AdsService {
         ad.dispose();
         _interstitialAd = null;
         _loadInterstitial();
+        onClosed?.call();
       },
       onAdFailedToShowFullScreenContent: (ad, error) {
         ad.dispose();
         _interstitialAd = null;
         _loadInterstitial();
+        onClosed?.call();
       },
     );
     _interstitialAd = null;
