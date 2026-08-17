@@ -90,9 +90,12 @@ class _MemoriaScreenState extends State<MemoriaScreen> {
       if (matched.length == cards.length) {
         // pairCount é o mínimo teórico (zero erros), impossível na prática
         // já que as cartas ficam escondidas até serem viradas pela 1ª vez.
-        // Quanto menor a criança, mais limitada é a memória de curto prazo,
-        // então a margem de erro tolerada cresce pra faixa mais nova.
-        final multiplier = switch (widget.age.level) { 0 => 3.0, 1 => 2.0, _ => 1.5 };
+        // 2-4 e 5-6 anos usam a mesma margem generosa (memória de curto
+        // prazo ainda limitada nas duas). 7-8 exige nota máxima (8/8) pra
+        // avançar de fase — 1.5x era generoso demais na teoria mas exigia
+        // efetivamente jogo quase perfeito num tabuleiro de 20 cartas, então
+        // a margem cresceu pra ficar alcançável de verdade.
+        final multiplier = widget.age.level <= 1 ? 3.0 : 2.2;
         final achievableGoal = (pairCount * multiplier).ceil();
         // A nota máxima acompanha a exigência da faixa etária (5/6/8), pra
         // bater com o "X de X estrelas" mostrado no resto do app.
