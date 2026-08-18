@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../../models/age_group.dart';
-import '../../models/scoring.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/app_background.dart';
 import '../../widgets/end_game_dialog.dart';
@@ -41,7 +40,6 @@ class _QuebraCabecaScreenState extends State<QuebraCabecaScreen> {
   late int gridN;
   late Drawing drawing;
   late List<int> pieceOrder;
-  late int minMoves;
   int swaps = 0;
   int? selectedIndex;
 
@@ -62,7 +60,6 @@ class _QuebraCabecaScreenState extends State<QuebraCabecaScreen> {
       order = List.generate(n, (i) => i)..shuffle(random);
     } while (_minSwapsToSort(order) == 0 && n > 1);
     pieceOrder = order;
-    minMoves = _minSwapsToSort(order);
     swaps = 0;
     selectedIndex = null;
   }
@@ -90,14 +87,16 @@ class _QuebraCabecaScreenState extends State<QuebraCabecaScreen> {
 
     final solved = List.generate(pieceOrder.length, (i) => i == pieceOrder[i]).every((v) => v);
     if (solved) {
-      // A nota máxima acompanha a exigência da faixa etária (5/6/8), pra
-      // bater com o "X de X estrelas" mostrado no resto do app.
+      // Terminar a figura (mesmo com várias trocas de tentativa e erro pelo
+      // caminho) já dá nota máxima — pontuar pelo número de trocas exigia
+      // acertar praticamente o número mínimo teórico (quase impossível pra
+      // uma criança num tabuleiro maior), mesmo bug que a Memória tinha.
       final maxStars = widget.age.starsToAdvance;
-      final stars = min(starsFromEfficiency(swaps, minMoves == 0 ? 1 : minMoves), maxStars);
+      if (!mounted) return;
       await showEndGameDialog(
         context,
         gameId: 'quebra_cabeca',
-        stars: stars,
+        stars: maxStars,
         maxStars: maxStars,
         onReplay: _restart,
       );
