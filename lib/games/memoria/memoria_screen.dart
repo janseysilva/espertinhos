@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/age_group.dart';
-import '../../models/scoring.dart';
 import '../../services/music_service.dart';
 import '../../services/tts_service.dart';
 import '../../widgets/app_background.dart';
@@ -88,24 +87,15 @@ class _MemoriaScreenState extends State<MemoriaScreen> {
         locked = false;
       });
       if (matched.length == cards.length) {
-        // pairCount é o mínimo teórico (zero erros), impossível na prática
-        // já que as cartas ficam escondidas até serem viradas pela 1ª vez.
-        // 2-4 e 5-6 anos usam a mesma margem generosa (memória de curto
-        // prazo ainda limitada nas duas). 7-8 exige nota máxima (8/8) pra
-        // avançar de fase — 1.5x era generoso demais na teoria mas exigia
-        // efetivamente jogo quase perfeito num tabuleiro de 20 cartas, então
-        // a margem cresceu pra ficar alcançável de verdade.
-        final multiplier = widget.age.level <= 1 ? 3.0 : 2.2;
-        final achievableGoal = (pairCount * multiplier).ceil();
-        // A nota máxima acompanha a exigência da faixa etária (5/6/8), pra
-        // bater com o "X de X estrelas" mostrado no resto do app.
+        // Achar todos os pares (mesmo com vários erros pelo caminho) já
+        // dá nota máxima — pontuar pelo número de jogadas ficava difícil
+        // demais de alcançar em qualquer faixa etária, então tirado.
         final maxStars = widget.age.starsToAdvance;
-        final stars = min(starsFromEfficiency(moves, achievableGoal), maxStars);
         if (!mounted) return;
         await showEndGameDialog(
           context,
           gameId: 'memoria',
-          stars: stars,
+          stars: maxStars,
           maxStars: maxStars,
           onReplay: _restart,
         );
