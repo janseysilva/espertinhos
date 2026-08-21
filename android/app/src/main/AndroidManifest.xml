@@ -30,11 +30,10 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-        <!-- AdMob App ID: ID DE TESTE oficial do Google. Trocar pelo ID real
-             (Play Console/AdMob do Jansey) quando a conta AdMob for criada. -->
+        <!-- AdMob App ID real (conta AdMob do Jansey). -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+            android:value="ca-app-pub-1435621547457341~3013590387" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

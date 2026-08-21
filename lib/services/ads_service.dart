@@ -1,9 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-/// ID DE TESTE oficial do Google (intersticial, Android). Trocar pelo ID
-/// real do AdMob do Jansey quando a conta AdMob for criada.
-const _testInterstitialUnitId = 'ca-app-pub-3940256099942544/1033173712';
+/// ID real do bloco de anúncios intersticial (conta AdMob do Jansey).
+const _interstitialUnitId = 'ca-app-pub-1435621547457341/9080254954';
 
 /// Anúncio de tela inteira mostrado em pontos de pausa natural (ex: ao
 /// voltar pro menu depois de um jogo) — nunca no meio da brincadeira.
@@ -30,7 +29,7 @@ class AdsService {
     if (_loading || _interstitialAd != null) return;
     _loading = true;
     InterstitialAd.load(
-      adUnitId: _testInterstitialUnitId,
+      adUnitId: _interstitialUnitId,
       request: const AdRequest(nonPersonalizedAds: true),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {
