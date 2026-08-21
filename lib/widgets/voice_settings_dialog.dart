@@ -99,9 +99,9 @@ class _VoiceSettingsDialogState extends State<_VoiceSettingsDialog> {
                                 selected: _selected == null,
                                 onTap: () => _choose(null),
                               ),
-                              for (final v in _voices!)
+                              for (final (i, v) in _voices!.indexed)
                                 _VoiceTile(
-                                  label: v['name'] ?? v['locale'] ?? '?',
+                                  label: 'Voz ${i + 1}',
                                   selected: _selected != null && _selected!['name'] == v['name'],
                                   onTap: () => _choose(v),
                                 ),
