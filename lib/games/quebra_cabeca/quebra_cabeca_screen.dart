@@ -253,21 +253,31 @@ class _PicturePainter extends CustomPainter {
       canvas.drawPath(path, fill);
       canvas.drawPath(path, stroke);
     }
-    // Sombreado diagonal por cima de TUDO (fundo e formas), não só o fundo
-    // — formas grandes de cor sólida (ex: o corpo de um robô ou carro)
-    // continuavam idênticas entre si em tabuleiros maiores mesmo com o
-    // fundo em degradê, porque a tinta sólida cobria o degradê por baixo.
-    // Multiplicando por cima, toda posição do tabuleiro fica com uma
-    // tonalidade própria — não existe mais peça igual a outra, mesmo
-    // dentro da mesma forma.
-    final shade = Paint()
+    // Sombreado por cima de TUDO (fundo e formas), não só o fundo — formas
+    // grandes de cor sólida (ex: corpo de um robô ou carro) continuavam
+    // idênticas entre si mesmo com o fundo em degradê, porque a tinta
+    // sólida cobria o degradê por baixo. UM gradiente diagonal só não
+    // bastava: ele varia junto com linha+coluna, então células "espelhadas"
+    // (ex: linha 0 coluna 3 e linha 3 coluna 0) ficavam com sombra quase
+    // igual — e como os desenhos costumam ser simétricos (rodas de carro,
+    // olhos de robô, janelas de casa), esses pares continuavam parecidos.
+    // Dois sombreados independentes (horizontal + vertical) resolvem: a
+    // tonalidade de cada posição passa a depender de linha E coluna de
+    // verdade, então não existem mais duas posições com a mesma sombra.
+    final shadeH = Paint()
       ..blendMode = BlendMode.multiply
       ..shader = const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [Colors.white, Color(0xFF9098B0)],
+        colors: [Color(0xFF8892B0), Colors.white],
       ).createShader(Offset.zero & size);
-    canvas.drawRect(Offset.zero & size, shade);
+    canvas.drawRect(Offset.zero & size, shadeH);
+    final shadeV = Paint()
+      ..blendMode = BlendMode.multiply
+      ..shader = const LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [Color(0xFFB0985C), Colors.white],
+      ).createShader(Offset.zero & size);
+    canvas.drawRect(Offset.zero & size, shadeV);
   }
 
   @override
