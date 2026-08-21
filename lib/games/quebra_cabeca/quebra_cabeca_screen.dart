@@ -51,7 +51,11 @@ class _QuebraCabecaScreenState extends State<QuebraCabecaScreen> {
   @override
   void initState() {
     super.initState();
-    gridN = switch (widget.age.level) { 0 => 2, 1 => 3, _ => 5 };
+    // 7-8 anos era 5x5 (25 peças) — difícil demais de acertar via trocas
+    // pra uma criança, mesmo com o sombreado ajudando a diferenciar as
+    // peças. Reduzido pra 4x4 (16), ainda o mais desafiador dos três mas
+    // alcançável de verdade.
+    gridN = switch (widget.age.level) { 0 => 2, 1 => 3, _ => 4 };
     final options = drawingsForAge(widget.age);
     drawing = options[Random().nextInt(options.length)];
     _shuffle();
