@@ -2,7 +2,7 @@
 
 Quando você criar a faixa de teste fechado no Play Console, ele vai te dar um
 link de convite (algo como `https://play.google.com/apps/testing/com.espertinhos.espertinhos`).
-Cole esse link no lugar de `[LINK AQUI]` abaixo e mande a mensagem.
+Cole esse link no lugar de `https://play.google.com/apps/testing/com.espertinhos.espertinhos` abaixo e mande a mensagem.
 
 ---
 
@@ -17,7 +17,7 @@ Store, o Google exige que algumas pessoas testem primeiro.
 Você poderia me ajudar? É rapidinho, não precisa saber nada de
 tecnologia:
 
-1️⃣ Abre esse link pelo celular: [LINK AQUI]
+1️⃣ Abre esse link pelo celular: https://play.google.com/apps/testing/com.espertinhos.espertinhos
 2️⃣ Toca em "Tornar-se testador" (ou "Become a tester")
 3️⃣ Instala o app pela Play Store (o link já leva pra lá)
 4️⃣ Abre o app pelo menos uma vez
@@ -34,7 +34,7 @@ Obrigado desde já 🙏
 
 ```
 Oi de novo! Conseguiu instalar o Espertinhos? Se ainda não, o link é
-esse: [LINK AQUI] — preciso manter o pessoal testando por pelo menos
+esse: https://play.google.com/apps/testing/com.espertinhos.espertinhos — preciso manter o pessoal testando por pelo menos
 14 dias pra poder lançar oficialmente. Valeu demais pela ajuda! 🐰
 ```
 
