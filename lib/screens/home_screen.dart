@@ -19,11 +19,13 @@ import '../models/age_group.dart';
 import '../models/game_def.dart';
 import '../services/app_state.dart';
 import '../services/purchase_service.dart';
+import '../services/tts_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/admin_lock_dialog.dart';
 import '../widgets/app_background.dart';
 import '../widgets/mascot.dart';
 import '../widgets/squishy_button.dart';
+import '../widgets/voice_settings_dialog.dart';
 import 'age_select_screen.dart';
 
 final List<GameDef> kGames = [
@@ -136,6 +138,12 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _changeVoice(BuildContext context) async {
+    final ok = await showAdminLockDialog(context);
+    if (!ok || !context.mounted) return;
+    await showVoiceSettingsDialog(context, context.read<TtsService>());
+  }
+
   Future<void> _buyRemoveAds(BuildContext context) async {
     final purchases = context.read<PurchaseService>();
     if (!purchases.productAvailable) {
@@ -194,6 +202,23 @@ class HomeScreen extends StatelessWidget {
                           Text(
                             '${age.label} · trocar',
                             style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SquishyButton(
+                      color: Colors.white.withValues(alpha: 0.85),
+                      borderRadius: 999,
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      onTap: () => _changeVoice(context),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('🗣️', style: TextStyle(fontSize: 14)),
+                          SizedBox(width: 6),
+                          Text(
+                            'Voz',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent, fontSize: 12),
                           ),
                         ],
                       ),

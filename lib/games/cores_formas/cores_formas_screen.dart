@@ -57,7 +57,6 @@ class CoresFormasScreen extends StatelessWidget {
       totalRounds: age.starsToAdvance,
       gridCrossAxisCount: optionCount <= 4 ? 2 : 3,
       optionAspectRatio: 1.1,
-      speakPrompts: age.level <= 1,
       roundGenerator: (round) {
         final random = Random();
         final targetShape = shapes[random.nextInt(shapes.length)];

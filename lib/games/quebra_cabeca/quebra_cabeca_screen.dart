@@ -1,13 +1,18 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/age_group.dart';
+import '../../services/music_service.dart';
+import '../../services/tts_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/app_background.dart';
 import '../../widgets/end_game_dialog.dart';
 import '../../widgets/game_top_bar.dart';
 import '../pintar/drawings.dart';
+
+const _quebraCabecaPrompt = 'Toque em 2 peças para trocar de lugar';
 
 int _minSwapsToSort(List<int> perm) {
   final n = perm.length;
@@ -50,6 +55,17 @@ class _QuebraCabecaScreenState extends State<QuebraCabecaScreen> {
     final options = drawingsForAge(widget.age);
     drawing = options[Random().nextInt(options.length)];
     _shuffle();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (context.read<MusicService>().muted) return;
+      context.read<TtsService>().speak(_quebraCabecaPrompt);
+    });
+  }
+
+  @override
+  void dispose() {
+    context.read<TtsService>().stop();
+    super.dispose();
   }
 
   void _shuffle() {

@@ -39,7 +39,6 @@ class OpostosScreen extends StatelessWidget {
       totalRounds: age.starsToAdvance,
       gridCrossAxisCount: 2,
       optionAspectRatio: 1.4,
-      speakPrompts: age.level <= 1,
       roundGenerator: (round) {
         final random = Random();
         final pairIndex = round % pairs.length;

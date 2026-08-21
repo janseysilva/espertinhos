@@ -38,18 +38,16 @@ class _CacaPalavrasScreenState extends State<CacaPalavrasScreen> {
   void initState() {
     super.initState();
     _setup();
-    if (widget.age.level <= 1) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        if (context.read<MusicService>().muted) return;
-        context.read<TtsService>().speak(_cacaPalavrasPrompt);
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (context.read<MusicService>().muted) return;
+      context.read<TtsService>().speak(_cacaPalavrasPrompt);
+    });
   }
 
   @override
   void dispose() {
-    if (widget.age.level <= 1) context.read<TtsService>().stop();
+    context.read<TtsService>().stop();
     super.dispose();
   }
 

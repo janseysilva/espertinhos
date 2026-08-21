@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/age_group.dart';
+import '../../services/music_service.dart';
+import '../../services/tts_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/app_background.dart';
 import '../../widgets/end_game_dialog.dart';
 import '../../widgets/game_top_bar.dart';
 import '../../widgets/squishy_button.dart';
 import 'drawings.dart';
+
+const _choosePrompt = 'Escolha um desenho para pintar';
+const _paintPrompt = 'Toque nas partes do desenho para escolher a cor';
 
 const _paintColors = <Color>[
   Color(0xFFEF5350),
@@ -35,11 +41,30 @@ class _PintarScreenState extends State<PintarScreen> {
   late List<Color?> partColors;
   Color currentColor = _paintColors.first;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _speak(_choosePrompt));
+  }
+
+  void _speak(String text) {
+    if (!mounted) return;
+    if (context.read<MusicService>().muted) return;
+    context.read<TtsService>().speak(text);
+  }
+
+  @override
+  void dispose() {
+    context.read<TtsService>().stop();
+    super.dispose();
+  }
+
   void _select(Drawing d) {
     setState(() {
       selected = d;
       partColors = List<Color?>.filled(d.parts.length, null);
     });
+    _speak(_paintPrompt);
   }
 
   void _finish() {

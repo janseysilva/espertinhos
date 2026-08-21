@@ -26,7 +26,6 @@ class ContandoScreen extends StatelessWidget {
       totalRounds: age.starsToAdvance,
       gridCrossAxisCount: 3,
       optionAspectRatio: 1.0,
-      speakPrompts: age.level <= 1,
       roundGenerator: (round) {
         final random = Random();
         final target = minN + random.nextInt(maxN - minN + 1);

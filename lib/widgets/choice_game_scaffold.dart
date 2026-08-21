@@ -22,8 +22,7 @@ class RoundData {
 
   final Widget prompt;
 
-  /// Versão em texto puro do [prompt], falada em voz alta quando
-  /// [ChoiceGameScreen.speakPrompts] está ligado (faixas de 2 a 4 e 5 a 6 anos).
+  /// Versão em texto puro do [prompt], falada em voz alta em toda faixa etária.
   final String promptText;
   final List<ChoiceOption> options;
 }
@@ -37,7 +36,6 @@ class ChoiceGameScreen extends StatefulWidget {
     required this.roundGenerator,
     this.gridCrossAxisCount = 2,
     this.optionAspectRatio = 1.3,
-    this.speakPrompts = false,
   });
 
   final String gameId;
@@ -46,10 +44,6 @@ class ChoiceGameScreen extends StatefulWidget {
   final RoundData Function(int roundIndex) roundGenerator;
   final int gridCrossAxisCount;
   final double optionAspectRatio;
-
-  /// Lê o comando de cada rodada em voz alta — pensado pra faixa de 2 a 4
-  /// anos, que ainda não sabe ler.
-  final bool speakPrompts;
 
   @override
   State<ChoiceGameScreen> createState() => _ChoiceGameScreenState();
@@ -66,20 +60,18 @@ class _ChoiceGameScreenState extends State<ChoiceGameScreen> {
   void initState() {
     super.initState();
     current = widget.roundGenerator(0);
-    if (widget.speakPrompts) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _speakCurrentPrompt());
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) => _speakCurrentPrompt());
   }
 
   void _speakCurrentPrompt() {
-    if (!widget.speakPrompts || !mounted) return;
+    if (!mounted) return;
     if (context.read<MusicService>().muted) return;
     context.read<TtsService>().speak(current.promptText);
   }
 
   @override
   void dispose() {
-    if (widget.speakPrompts) context.read<TtsService>().stop();
+    context.read<TtsService>().stop();
     super.dispose();
   }
 

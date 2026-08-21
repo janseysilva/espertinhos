@@ -40,18 +40,16 @@ class _MemoriaScreenState extends State<MemoriaScreen> {
     super.initState();
     pairCount = switch (widget.age.level) { 0 => 4, 1 => 6, _ => 10 };
     _setup();
-    if (widget.age.level <= 1) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        if (context.read<MusicService>().muted) return;
-        context.read<TtsService>().speak(_memoriaPrompt);
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (context.read<MusicService>().muted) return;
+      context.read<TtsService>().speak(_memoriaPrompt);
+    });
   }
 
   @override
   void dispose() {
-    if (widget.age.level <= 1) context.read<TtsService>().stop();
+    context.read<TtsService>().stop();
     super.dispose();
   }
 
