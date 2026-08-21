@@ -242,24 +242,28 @@ class _PicturePainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3
       ..color = Colors.black87;
-    // Gradiente diagonal em vez de fundo branco liso — em tabuleiros maiores
-    // (3x3, 5x5) várias peças caem em área "vazia" do desenho (sem tinta) e
-    // ficariam idênticas num fundo branco puro, deixando a criança montar
-    // errado sem perceber (o quebra-cabeça "parece" pronto mas não é). Com
-    // o gradiente, cada posição do tabuleiro tem uma tonalidade própria.
-    final bg = Paint()
-      ..shader = const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [Color(0xFFEAF3FF), Color(0xFFFFEAF3)],
-      ).createShader(Offset.zero & size);
-    canvas.drawRect(Offset.zero & size, bg);
+    canvas.drawRect(Offset.zero & size, Paint()..color = Colors.white);
     for (var i = 0; i < drawing.parts.length; i++) {
       final path = drawing.parts[i](size);
       fill.color = AppColors.palette[i % AppColors.palette.length];
       canvas.drawPath(path, fill);
       canvas.drawPath(path, stroke);
     }
+    // Sombreado diagonal por cima de TUDO (fundo e formas), não só o fundo
+    // — formas grandes de cor sólida (ex: o corpo de um robô ou carro)
+    // continuavam idênticas entre si em tabuleiros maiores mesmo com o
+    // fundo em degradê, porque a tinta sólida cobria o degradê por baixo.
+    // Multiplicando por cima, toda posição do tabuleiro fica com uma
+    // tonalidade própria — não existe mais peça igual a outra, mesmo
+    // dentro da mesma forma.
+    final shade = Paint()
+      ..blendMode = BlendMode.multiply
+      ..shader = const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Colors.white, Color(0xFF9098B0)],
+      ).createShader(Offset.zero & size);
+    canvas.drawRect(Offset.zero & size, shade);
   }
 
   @override
