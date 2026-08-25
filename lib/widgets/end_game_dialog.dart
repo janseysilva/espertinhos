@@ -16,7 +16,7 @@ import 'squishy_button.dart';
 /// Tempo máximo de espera pelo anúncio antes de liberar a criança mesmo
 /// assim — sem essa rede de segurança, sem internet ela ficaria travada
 /// pra sempre nessa tela (o anúncio nunca chega a carregar).
-const _adWaitTimeout = Duration(seconds: 15);
+const _adWaitSeconds = 30;
 
 Future<void> showEndGameDialog(
   BuildContext context, {
@@ -62,7 +62,8 @@ class _EndGameResultDialogState extends State<EndGameResultDialog> {
   // tempo máximo de espera, se não tiver anúncio disponível — ex: sem
   // internet). Enquanto isso, os botões ficam escondidos.
   bool _canContinue = false;
-  Timer? _fallbackTimer;
+  int _secondsLeft = _adWaitSeconds;
+  Timer? _countdownTimer;
 
   double get _ratio => widget.maxStars <= 0 ? 0 : widget.stars / widget.maxStars;
 
@@ -84,21 +85,30 @@ class _EndGameResultDialogState extends State<EndGameResultDialog> {
     ads.showIfReady(
       onClosed: () {
         music.resumeIfNeeded();
-        _fallbackTimer?.cancel();
+        _countdownTimer?.cancel();
         if (mounted) setState(() => _canContinue = true);
       },
     );
     // Se não tinha anúncio pronto (sem internet, por exemplo), showIfReady
-    // não chama onClosed — libera a criança mesmo assim depois de esperar
-    // um pouco, em vez de travar o app pra sempre.
-    _fallbackTimer = Timer(_adWaitTimeout, () {
-      if (mounted && !_canContinue) setState(() => _canContinue = true);
+    // não chama onClosed — a contagem regressiva libera a criança mesmo
+    // assim ao chegar em zero, em vez de travar o app pra sempre.
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) return;
+      if (_secondsLeft <= 1) {
+        timer.cancel();
+        setState(() {
+          _secondsLeft = 0;
+          _canContinue = true;
+        });
+      } else {
+        setState(() => _secondsLeft--);
+      }
     });
   }
 
   @override
   void dispose() {
-    _fallbackTimer?.cancel();
+    _countdownTimer?.cancel();
     _confetti.dispose();
     super.dispose();
   }
@@ -161,19 +171,24 @@ class _EndGameResultDialogState extends State<EndGameResultDialog> {
                   ),
                   const SizedBox(height: 20),
                   if (!_canContinue)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Column(
                         children: [
-                          SizedBox(
+                          const SizedBox(
                             width: 26,
                             height: 26,
                             child: CircularProgressIndicator(strokeWidth: 3, color: AppColors.accent),
                           ),
-                          SizedBox(height: 10),
-                          Text(
-                            'Só mais um instante...',
+                          const SizedBox(height: 10),
+                          const Text(
+                            'Aguardando anúncio...',
                             style: TextStyle(color: AppColors.textDark, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '$_secondsLeft',
+                            style: const TextStyle(color: AppColors.accent, fontWeight: FontWeight.w800, fontSize: 20),
                           ),
                         ],
                       ),
