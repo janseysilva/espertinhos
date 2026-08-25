@@ -10,7 +10,19 @@ import '../models/age_group.dart';
 /// trocar de faixa etária ou reabrir o app.
 class LocalProgressStore {
   static const _ageGroupKey = 'localAgeGroupId';
+  static const _childNameKey = 'localChildName';
   static String _phaseKey(String ageId) => 'localUnlockedPhase_$ageId';
+
+  Future<String?> loadChildName() async {
+    final prefs = await SharedPreferences.getInstance();
+    final name = prefs.getString(_childNameKey);
+    return (name == null || name.trim().isEmpty) ? null : name;
+  }
+
+  Future<void> saveChildName(String name) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_childNameKey, name.trim());
+  }
 
   Future<AgeGroup?> loadAgeGroup() async {
     final prefs = await SharedPreferences.getInstance();

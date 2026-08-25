@@ -113,16 +113,20 @@ class _EndGameResultDialogState extends State<EndGameResultDialog> {
     super.dispose();
   }
 
-  String get _message {
-    if (_ratio >= 1.0) return 'Perfeito!';
-    if (_ratio >= 0.75) return 'Muito bem!';
-    if (_ratio >= 0.5) return 'Bom trabalho!';
-    return 'Continue tentando!';
+  // Personaliza a mensagem com o nome da criança (capturado na primeira
+  // vez que o app abre) — "Parabéns, Maria!" em vez de só "Parabéns!".
+  String _messageFor(String? name) {
+    final who = (name == null || name.isEmpty) ? '' : ', $name';
+    if (_ratio >= 1.0) return 'Parabéns$who! Perfeito!';
+    if (_ratio >= 0.75) return 'Parabéns$who! Muito bem!';
+    if (_ratio >= 0.5) return 'Bom trabalho$who!';
+    return 'Continue tentando$who!';
   }
 
   @override
   Widget build(BuildContext context) {
     final starSize = widget.maxStars > 6 ? 22.0 : 30.0;
+    final childName = context.watch<AppState>().childName;
     return PopScope(
       // Trava o botão "voltar" do Android enquanto espera o anúncio, senão
       // a criança escapa dessa tela sem assistir.
@@ -149,7 +153,7 @@ class _EndGameResultDialogState extends State<EndGameResultDialog> {
                   const Mascot(size: 54),
                   const SizedBox(height: 10),
                   Text(
-                    _message,
+                    _messageFor(childName),
                     style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.textDark),
                   ),
                   const SizedBox(height: 10),

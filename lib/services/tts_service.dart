@@ -44,9 +44,11 @@ class TtsService {
     }
   }
 
-  /// Lista as vozes em português instaladas no aparelho — varia por
-  /// fabricante/versão do Android, por isso não dá pra saber de antemão
-  /// quais existem; o app pergunta direto pro sistema.
+  /// Lista as vozes em português BRASILEIRO instaladas no aparelho — varia
+  /// por fabricante/versão do Android, por isso não dá pra saber de
+  /// antemão quais existem; o app pergunta direto pro sistema. Fica de
+  /// fora qualquer voz de outro português (ex: Portugal), pra não confundir
+  /// a criança com uma pronúncia diferente da que ela conhece.
   Future<List<Map<String, String>>> listPortugueseVoices() async {
     await _ensureReady();
     try {
@@ -56,8 +58,9 @@ class TtsService {
         if (v is Map) {
           final name = v['name']?.toString();
           final locale = v['locale']?.toString();
-          if (name != null && locale != null && locale.toLowerCase().startsWith('pt')) {
-            voices.add({'name': name, 'locale': locale});
+          final normalizedLocale = locale?.toLowerCase().replaceAll('_', '-');
+          if (name != null && normalizedLocale != null && normalizedLocale.startsWith('pt-br')) {
+            voices.add({'name': name, 'locale': locale!});
           }
         }
       }

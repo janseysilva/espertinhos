@@ -7,6 +7,7 @@ import '../widgets/app_background.dart';
 import '../widgets/mascot.dart';
 import 'age_select_screen.dart';
 import 'home_screen.dart';
+import 'name_capture_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -32,8 +33,11 @@ class _SplashScreenState extends State<SplashScreen> {
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (_) =>
-            appState.ageGroup == null ? const AgeSelectScreen() : const HomeScreen(),
+        builder: (_) {
+          if (appState.childName == null) return const NameCaptureScreen();
+          if (appState.ageGroup == null) return const AgeSelectScreen();
+          return const HomeScreen();
+        },
       ),
     );
   }

@@ -9,6 +9,7 @@ import 'services/purchase_service.dart';
 import 'services/tts_service.dart';
 import 'theme/app_theme.dart';
 import 'widgets/mute_button.dart';
+import 'widgets/voice_button.dart';
 
 class EspertinhosApp extends StatelessWidget {
   const EspertinhosApp({super.key});
@@ -35,6 +36,10 @@ class EspertinhosApp extends StatelessWidget {
               const Align(
                 alignment: Alignment.topRight,
                 child: MuteButton(),
+              ),
+              const Align(
+                alignment: Alignment.topLeft,
+                child: VoiceButton(),
               ),
             ],
           );

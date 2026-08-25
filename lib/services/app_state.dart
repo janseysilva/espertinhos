@@ -10,6 +10,7 @@ import 'profile_service.dart';
 
 class AppState extends ChangeNotifier {
   String? uid;
+  String? childName;
   AgeGroup? ageGroup;
   bool initialized = false;
   bool offline = false;
@@ -17,10 +18,11 @@ class AppState extends ChangeNotifier {
   ProfileService? _profileService;
   final LocalProgressStore _local = LocalProgressStore();
 
-  /// A faixa etária e as fases desbloqueadas vêm do aparelho (instantâneo,
-  /// sem rede) — a nuvem conecta em segundo plano só pro contador de
-  /// estrelas vitalício e como cópia de segurança.
+  /// O nome da criança e a faixa etária/fases desbloqueadas vêm do
+  /// aparelho (instantâneo, sem rede) — a nuvem conecta em segundo plano
+  /// só pro contador de estrelas vitalício e como cópia de segurança.
   Future<void> init() async {
+    childName = await _local.loadChildName();
     ageGroup = await _local.loadAgeGroup();
     if (ageGroup != null) {
       unlockedPhase = await _local.loadUnlockedPhase(ageGroup!.id);
@@ -28,6 +30,12 @@ class AppState extends ChangeNotifier {
     initialized = true;
     notifyListeners();
     unawaited(_connectCloud());
+  }
+
+  Future<void> setChildName(String name) async {
+    childName = name.trim();
+    notifyListeners();
+    await _local.saveChildName(childName!);
   }
 
   Future<void> _connectCloud() async {
@@ -51,6 +59,18 @@ class AppState extends ChangeNotifier {
     await _local.saveAgeGroup(age);
     notifyListeners();
     unawaited(_profileService?.setAgeGroup(age));
+  }
+
+  /// Zera o progresso de fases da faixa etária atual, voltando pra fase 1
+  /// — usado pelo botão "Resetar fases" (atrás da trava dos responsáveis,
+  /// já que é uma ação destrutiva).
+  Future<void> resetPhaseProgress() async {
+    final age = ageGroup;
+    if (age == null) return;
+    await _local.saveUnlockedPhase(age.id, 1);
+    unlockedPhase = 1;
+    notifyListeners();
+    unawaited(_profileService?.setUnlockedPhase(age.id, 1));
   }
 
   /// Um jogo (fase) só fica jogável se seu índice em [kGameOrder] for menor

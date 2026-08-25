@@ -19,13 +19,11 @@ import '../models/age_group.dart';
 import '../models/game_def.dart';
 import '../services/app_state.dart';
 import '../services/purchase_service.dart';
-import '../services/tts_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/admin_lock_dialog.dart';
 import '../widgets/app_background.dart';
 import '../widgets/mascot.dart';
 import '../widgets/squishy_button.dart';
-import '../widgets/voice_settings_dialog.dart';
 import 'age_select_screen.dart';
 
 final List<GameDef> kGames = [
@@ -138,10 +136,29 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _changeVoice(BuildContext context) async {
+  Future<void> _resetPhases(BuildContext context) async {
     final ok = await showAdminLockDialog(context);
     if (!ok || !context.mounted) return;
-    await showVoiceSettingsDialog(context, context.read<TtsService>());
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Resetar fases?'),
+        content: const Text(
+          'Isso apaga o progresso de fases da faixa etária atual, voltando pra fase 1. Não dá pra desfazer.',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Resetar')),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+    await context.read<AppState>().resetPhaseProgress();
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Fases resetadas!'), behavior: SnackBarBehavior.floating),
+      );
+    }
   }
 
   Future<void> _buyRemoveAds(BuildContext context) async {
@@ -210,14 +227,14 @@ class HomeScreen extends StatelessWidget {
                       color: Colors.white.withValues(alpha: 0.85),
                       borderRadius: 999,
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                      onTap: () => _changeVoice(context),
+                      onTap: () => _resetPhases(context),
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text('🗣️', style: TextStyle(fontSize: 14)),
+                          Text('🔄', style: TextStyle(fontSize: 14)),
                           SizedBox(width: 6),
                           Text(
-                            'Voz',
+                            'Resetar fases',
                             style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent, fontSize: 12),
                           ),
                         ],
