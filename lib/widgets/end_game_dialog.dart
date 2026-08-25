@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:confetti/confetti.dart';
@@ -11,6 +12,11 @@ import '../services/purchase_service.dart';
 import '../theme/app_theme.dart';
 import 'mascot.dart';
 import 'squishy_button.dart';
+
+/// Tempo máximo de espera pelo anúncio antes de liberar a criança mesmo
+/// assim — sem essa rede de segurança, sem internet ela ficaria travada
+/// pra sempre nessa tela (o anúncio nunca chega a carregar).
+const _adWaitTimeout = Duration(seconds: 15);
 
 Future<void> showEndGameDialog(
   BuildContext context, {
@@ -52,16 +58,47 @@ class _EndGameResultDialogState extends State<EndGameResultDialog> {
   late final ConfettiController _confetti =
       ConfettiController(duration: const Duration(seconds: 2));
 
+  // A criança só sai dessa tela depois de assistir ao anúncio (ou de um
+  // tempo máximo de espera, se não tiver anúncio disponível — ex: sem
+  // internet). Enquanto isso, os botões ficam escondidos.
+  bool _canContinue = false;
+  Timer? _fallbackTimer;
+
   double get _ratio => widget.maxStars <= 0 ? 0 : widget.stars / widget.maxStars;
 
   @override
   void initState() {
     super.initState();
     if (_ratio >= 0.75) _confetti.play();
+    _watchAd();
+  }
+
+  Future<void> _watchAd() async {
+    if (context.read<PurchaseService>().adsRemoved) {
+      setState(() => _canContinue = true);
+      return;
+    }
+    final ads = context.read<AdsService>();
+    final music = context.read<MusicService>();
+    await music.pauseForAd();
+    ads.showIfReady(
+      onClosed: () {
+        music.resumeIfNeeded();
+        _fallbackTimer?.cancel();
+        if (mounted) setState(() => _canContinue = true);
+      },
+    );
+    // Se não tinha anúncio pronto (sem internet, por exemplo), showIfReady
+    // não chama onClosed — libera a criança mesmo assim depois de esperar
+    // um pouco, em vez de travar o app pra sempre.
+    _fallbackTimer = Timer(_adWaitTimeout, () {
+      if (mounted && !_canContinue) setState(() => _canContinue = true);
+    });
   }
 
   @override
   void dispose() {
+    _fallbackTimer?.cancel();
     _confetti.dispose();
     super.dispose();
   }
@@ -76,107 +113,124 @@ class _EndGameResultDialogState extends State<EndGameResultDialog> {
   @override
   Widget build(BuildContext context) {
     final starSize = widget.maxStars > 6 ? 22.0 : 30.0;
-    return Stack(
-      alignment: Alignment.topCenter,
-      children: [
-        Dialog(
-          backgroundColor: Colors.transparent,
-          insetPadding: const EdgeInsets.all(24),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(26, 30, 26, 24),
-            constraints: const BoxConstraints(maxWidth: 320),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(26),
-              boxShadow: [
-                BoxShadow(color: Colors.black.withValues(alpha: 0.25), blurRadius: 30, offset: const Offset(0, 10)),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Mascot(size: 54),
-                const SizedBox(height: 10),
-                Text(
-                  _message,
-                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.textDark),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  '${widget.stars} de ${widget.maxStars} estrelas',
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.accent),
-                ),
-                const SizedBox(height: 8),
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  children: List.generate(
-                    widget.maxStars,
-                    (i) => Icon(
-                      Icons.star_rounded,
-                      color: i < widget.stars ? AppColors.starOn : AppColors.starOff,
-                      size: starSize,
-                    ),
+    return PopScope(
+      // Trava o botão "voltar" do Android enquanto espera o anúncio, senão
+      // a criança escapa dessa tela sem assistir.
+      canPop: _canContinue,
+      child: Stack(
+        alignment: Alignment.topCenter,
+        children: [
+          Dialog(
+            backgroundColor: Colors.transparent,
+            insetPadding: const EdgeInsets.all(24),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(26, 30, 26, 24),
+              constraints: const BoxConstraints(maxWidth: 320),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(26),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.25), blurRadius: 30, offset: const Offset(0, 10)),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Mascot(size: 54),
+                  const SizedBox(height: 10),
+                  Text(
+                    _message,
+                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.textDark),
                   ),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: SquishyButton(
-                    color: AppColors.bigRed,
-                    shadowColor: AppColors.bigRedShadow,
-                    borderRadius: 999,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      widget.onReplay();
-                    },
-                    child: const Center(
-                      child: Text(
-                        'JOGAR DE NOVO',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                  const SizedBox(height: 10),
+                  Text(
+                    '${widget.stars} de ${widget.maxStars} estrelas',
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.accent),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    children: List.generate(
+                      widget.maxStars,
+                      (i) => Icon(
+                        Icons.star_rounded,
+                        color: i < widget.stars ? AppColors.starOn : AppColors.starOff,
+                        size: starSize,
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.accent,
-                      side: const BorderSide(color: AppColors.accent, width: 2),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                  const SizedBox(height: 20),
+                  if (!_canContinue)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            width: 26,
+                            height: 26,
+                            child: CircularProgressIndicator(strokeWidth: 3, color: AppColors.accent),
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            'Só mais um instante...',
+                            style: TextStyle(color: AppColors.textDark, fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                    )
+                  else ...[
+                    SizedBox(
+                      width: double.infinity,
+                      child: SquishyButton(
+                        color: AppColors.bigRed,
+                        shadowColor: AppColors.bigRedShadow,
+                        borderRadius: 999,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          widget.onReplay();
+                        },
+                        child: const Center(
+                          child: Text(
+                            'JOGAR DE NOVO',
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                        ),
+                      ),
                     ),
-                    onPressed: () async {
-                      final nav = Navigator.of(context);
-                      final ads = context.read<AdsService>();
-                      final music = context.read<MusicService>();
-                      final adsRemoved = context.read<PurchaseService>().adsRemoved;
-                      nav.pop();
-                      nav.pop();
-                      if (!adsRemoved) {
-                        await music.pauseForAd();
-                        ads.showIfReady(onClosed: music.resumeIfNeeded);
-                      }
-                    },
-                    child: const Text('MENU', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  ),
-                ),
-              ],
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.accent,
+                          side: const BorderSide(color: AppColors.accent, width: 2),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('MENU', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
             ),
           ),
-        ),
-        ConfettiWidget(
-          confettiController: _confetti,
-          blastDirection: -pi / 2,
-          numberOfParticles: 24,
-          maxBlastForce: 20,
-          minBlastForce: 8,
-          gravity: 0.3,
-          shouldLoop: false,
-        ),
-      ],
+          ConfettiWidget(
+            confettiController: _confetti,
+            blastDirection: -pi / 2,
+            numberOfParticles: 24,
+            maxBlastForce: 20,
+            minBlastForce: 8,
+            gravity: 0.3,
+            shouldLoop: false,
+          ),
+        ],
+      ),
     );
   }
 }
