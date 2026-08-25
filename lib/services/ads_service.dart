@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -12,6 +14,7 @@ const _interstitialUnitId = 'ca-app-pub-1435621547457341/9080254954';
 class AdsService {
   InterstitialAd? _interstitialAd;
   bool _loading = false;
+  Timer? _retryTimer;
 
   Future<void> init() async {
     await MobileAds.instance.initialize();
@@ -23,6 +26,12 @@ class AdsService {
       ),
     );
     _loadInterstitial();
+    // Sem internet no momento (ou anúncio ainda "esquentando" no AdMob), a
+    // busca falha e só tentaria de novo na próxima vez que uma fase
+    // terminasse — se a internet só voltar por um instante entre uma fase
+    // e outra, essa janela passava batido. Tentando de novo periodicamente
+    // em segundo plano, aproveita qualquer instante de conexão disponível.
+    _retryTimer = Timer.periodic(const Duration(seconds: 45), (_) => _loadInterstitial());
   }
 
   void _loadInterstitial() {
@@ -74,6 +83,7 @@ class AdsService {
   }
 
   void dispose() {
+    _retryTimer?.cancel();
     _interstitialAd?.dispose();
   }
 }
