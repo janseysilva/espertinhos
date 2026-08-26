@@ -8,7 +8,6 @@ import '../games/alfabeto/alfabeto_screen.dart';
 import '../games/caca_palavras/caca_palavras_screen.dart';
 import '../games/contando/contando_screen.dart';
 import '../games/cores_formas/cores_formas_screen.dart';
-import '../games/espaco_planetas/espaco_planetas_screen.dart';
 import '../games/labirinto/labirinto_screen.dart';
 import '../games/maior_menor/maior_menor_screen.dart';
 import '../games/matematica/matematica_screen.dart';
@@ -20,7 +19,6 @@ import '../games/sequencia/sequencia_screen.dart';
 import '../games/sons_bichos/sons_bichos_screen.dart';
 import '../models/age_group.dart';
 import '../models/game_def.dart';
-import '../models/game_order.dart';
 import '../services/app_state.dart';
 import '../services/purchase_service.dart';
 import '../services/tts_service.dart';
@@ -146,17 +144,6 @@ final List<GameDef> kGames = [
     builder: (age) => SonsBichosScreen(age: age),
   ),
 ];
-
-/// Jogo especial, fora da grade normal — só aparece depois que a criança
-/// bate a meta de estrelas vitalícias (ver [AppState.isUnlocked]).
-final GameDef kSpecialGame = GameDef(
-  id: kSpecialGameId,
-  title: 'Espaço e Planetas',
-  emoji: '🪐',
-  color: AppColors.purple,
-  maxStars: 8,
-  builder: (age) => EspacoPlanetasScreen(age: age),
-);
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -307,23 +294,22 @@ class HomeScreen extends StatelessWidget {
                       crossAxisSpacing: 14,
                       childAspectRatio: 1.05,
                     ),
-                    itemCount: kGames.length + 1,
+                    itemCount: kGames.length,
                     itemBuilder: (context, i) {
-                      final isSpecial = i == kGames.length;
-                      final game = isSpecial ? kSpecialGame : kGames[i];
+                      final game = kGames[i];
                       final unlocked = appState.isUnlocked(game.id);
                       return _GameTile(
                         game: game,
                         index: i,
                         unlocked: unlocked,
-                        badgeLabel: isSpecial ? '★ ESPECIAL' : null,
                         onTap: () {
                           if (!unlocked) {
-                            final message = isSpecial
-                                ? '🔒 Junte ${AppState.specialGameStarsGoal} estrelas vitalícias pra desbloquear esse jogo especial!'
-                                : '🔒 Consiga ${age.starsToAdvance} estrelas na fase anterior pra desbloquear essa!';
+                            final needed = age.starsToAdvance;
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+                              SnackBar(
+                                content: Text('🔒 Consiga $needed estrelas na fase anterior pra desbloquear essa!'),
+                                behavior: SnackBarBehavior.floating,
+                              ),
                             );
                             return;
                           }
@@ -373,18 +359,12 @@ class _GameTile extends StatelessWidget {
     required this.index,
     required this.unlocked,
     required this.onTap,
-    this.badgeLabel,
   });
 
   final GameDef game;
   final int index;
   final bool unlocked;
   final VoidCallback onTap;
-
-  /// Selo mostrado no topo do cartão (ex: "FASE 3"). Nulo = usa o padrão
-  /// baseado no [index]. O jogo especial usa um selo próprio ("★ ESPECIAL"),
-  /// já que ele não faz parte da sequência normal de fases.
-  final String? badgeLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -406,7 +386,7 @@ class _GameTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(999),
               ),
               child: Text(
-                badgeLabel ?? 'FASE ${index + 1}',
+                'FASE ${index + 1}',
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
