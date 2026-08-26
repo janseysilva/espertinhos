@@ -11,38 +11,32 @@ class StarCounterBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appState = context.watch<AppState>();
-    return StreamBuilder<int>(
-      stream: appState.lifetimeStarsStream,
-      builder: (context, snap) {
-        final total = snap.data ?? 0;
-        return DecoratedBox(
-          decoration: const BoxDecoration(
-            color: AppColors.gold,
-            borderRadius: BorderRadius.all(Radius.circular(16)),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Icon(Icons.star_rounded, color: AppColors.starOn, size: 15),
-                const SizedBox(width: 4),
-                Text(
-                  '$total de 1000',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textDark,
-                    fontSize: 12,
-                    decoration: TextDecoration.none,
-                  ),
-                ),
-              ],
+    final total = context.watch<AppState>().lifetimeStars;
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        color: AppColors.gold,
+        borderRadius: BorderRadius.all(Radius.circular(16)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Icon(Icons.star_rounded, color: AppColors.starOn, size: 15),
+            const SizedBox(width: 4),
+            Text(
+              '$total de 1000',
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
+                color: AppColors.textDark,
+                fontSize: 12,
+                decoration: TextDecoration.none,
+              ),
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
 }

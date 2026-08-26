@@ -1,0 +1,18 @@
+Sons de animais baixados de https://pixabay.com/sound-effects/ (Pixabay Content License).
+
+Licença do Pixabay: uso livre, inclusive comercial, sem precisar de atribuição/crédito.
+Detalhes: https://pixabay.com/service/license-summary/
+
+Arquivo -> animal:
+cachorro.mp3  - cachorro latindo
+gato.mp3      - gato miando
+vaca.mp3      - vaca mugindo
+pato.mp3      - pato grasnando
+galo.mp3      - galo cantando
+leao.mp3      - leão rugindo
+cavalo.mp3    - cavalo relinchando
+ovelha.mp3    - ovelha balindo
+porco.mp3     - porco grunhindo
+elefante.mp3  - elefante trombeteando
+
+Baixado em 2026-08-26.

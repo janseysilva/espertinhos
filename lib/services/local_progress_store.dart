@@ -11,6 +11,7 @@ import '../models/age_group.dart';
 class LocalProgressStore {
   static const _ageGroupKey = 'localAgeGroupId';
   static const _childNameKey = 'localChildName';
+  static const _lifetimeStarsKey = 'localLifetimeStars';
   static String _phaseKey(String ageId) => 'localUnlockedPhase_$ageId';
 
   Future<String?> loadChildName() async {
@@ -44,5 +45,15 @@ class LocalProgressStore {
   Future<void> saveUnlockedPhase(String ageId, int phase) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_phaseKey(ageId), phase);
+  }
+
+  Future<int> loadLifetimeStars() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_lifetimeStarsKey) ?? 0;
+  }
+
+  Future<void> saveLifetimeStars(int total) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_lifetimeStarsKey, total);
   }
 }

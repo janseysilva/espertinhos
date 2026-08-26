@@ -73,6 +73,16 @@ flutter:
     - assets/audio/musica1.wav
     - assets/audio/musica2.wav
     - assets/audio/musica3.wav
+    - assets/audio/animais/cachorro.mp3
+    - assets/audio/animais/gato.mp3
+    - assets/audio/animais/vaca.mp3
+    - assets/audio/animais/pato.mp3
+    - assets/audio/animais/galo.mp3
+    - assets/audio/animais/leao.mp3
+    - assets/audio/animais/cavalo.mp3
+    - assets/audio/animais/ovelha.mp3
+    - assets/audio/animais/porco.mp3
+    - assets/audio/animais/elefante.mp3
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg

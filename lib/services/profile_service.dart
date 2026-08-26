@@ -61,4 +61,12 @@ class ProfileService {
           (s) => (s.data()?['lifetimeStars'] as num?)?.toInt() ?? 0,
         );
   }
+
+  /// Leitura única (não fica escutando) — usada só pra reconciliar o total
+  /// salvo no aparelho com o da nuvem na primeira vez que conecta, caso o
+  /// aparelho tenha sido trocado ou reinstalado.
+  Future<int> fetchLifetimeStars() async {
+    final snap = await _doc.get();
+    return (snap.data()?['lifetimeStars'] as num?)?.toInt() ?? 0;
+  }
 }

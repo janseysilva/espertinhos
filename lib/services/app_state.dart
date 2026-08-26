@@ -15,6 +15,7 @@ class AppState extends ChangeNotifier {
   bool initialized = false;
   bool offline = false;
   int unlockedPhase = 1;
+  int lifetimeStars = 0;
   ProfileService? _profileService;
   final LocalProgressStore _local = LocalProgressStore();
 
@@ -27,6 +28,7 @@ class AppState extends ChangeNotifier {
     if (ageGroup != null) {
       unlockedPhase = await _local.loadUnlockedPhase(ageGroup!.id);
     }
+    lifetimeStars = await _local.loadLifetimeStars();
     initialized = true;
     notifyListeners();
     unawaited(_connectCloud());
@@ -44,8 +46,26 @@ class AppState extends ChangeNotifier {
       uid = user.uid;
       _profileService = ProfileService(uid!);
       notifyListeners();
+      unawaited(_reconcileLifetimeStars());
     } catch (_) {
       offline = true;
+    }
+  }
+
+  /// Reconcilia o total salvo no aparelho com o da nuvem uma única vez ao
+  /// conectar — cobre o caso de trocar/reinstalar o aparelho, sem depender
+  /// da nuvem no dia a dia (o aparelho continua sendo a fonte da verdade
+  /// pra decidir o que a criança vê).
+  Future<void> _reconcileLifetimeStars() async {
+    try {
+      final remote = await _profileService?.fetchLifetimeStars();
+      if (remote != null && remote > lifetimeStars) {
+        lifetimeStars = remote;
+        await _local.saveLifetimeStars(lifetimeStars);
+        notifyListeners();
+      }
+    } catch (_) {
+      // Sem internet nesse momento — segue com o total já salvo no aparelho.
     }
   }
 
@@ -73,18 +93,24 @@ class AppState extends ChangeNotifier {
     unawaited(_profileService?.setUnlockedPhase(age.id, 1));
   }
 
+  /// Meta de estrelas vitalícias pra desbloquear o jogo especial — fora da
+  /// sequência normal de fases, vale pra qualquer faixa etária.
+  static const specialGameStarsGoal = 1000;
+
   /// Um jogo (fase) só fica jogável se seu índice em [kGameOrder] for menor
-  /// que [unlockedPhase] (a fase 1 é sempre liberada).
+  /// que [unlockedPhase] (a fase 1 é sempre liberada). O jogo especial não
+  /// entra em [kGameOrder] — sua liberação depende só do total de estrelas.
   bool isUnlocked(String gameId) {
+    if (gameId == kSpecialGameId) return lifetimeStars >= specialGameStarsGoal;
     final index = kGameOrder.indexOf(gameId);
     if (index < 0) return true;
     return index < unlockedPhase;
   }
 
   Future<void> recordGameResult(String gameId, int stars, int maxStars) async {
-    // A fase liberada é salva no aparelho primeiro (rápido, sempre funciona,
-    // é o que decide o que a criança vê) — o Firestore é atualizado em
-    // segundo plano só como cópia de segurança / pro contador de estrelas.
+    // A fase liberada e o total de estrelas são salvos no aparelho primeiro
+    // (rápido, sempre funciona, é o que decide o que a criança vê) — o
+    // Firestore é atualizado em segundo plano só como cópia de segurança.
     final age = ageGroup;
     if (age != null && stars >= age.starsToAdvance) {
       final index = kGameOrder.indexOf(gameId);
@@ -96,9 +122,9 @@ class AppState extends ChangeNotifier {
         unawaited(_profileService?.setUnlockedPhase(age.id, newPhase));
       }
     }
+    lifetimeStars += stars;
+    await _local.saveLifetimeStars(lifetimeStars);
+    notifyListeners();
     unawaited(_profileService?.recordGameResult(gameId, stars));
   }
-
-  Stream<int> get lifetimeStarsStream =>
-      _profileService?.lifetimeStarsStream() ?? const Stream<int>.empty();
 }
