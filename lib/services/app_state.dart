@@ -93,9 +93,15 @@ class AppState extends ChangeNotifier {
     unawaited(_profileService?.setUnlockedPhase(age.id, 1));
   }
 
+  /// Meta de estrelas vitalícias pra desbloquear o jogo especial — fora da
+  /// sequência normal de fases, vale pra qualquer faixa etária.
+  static const specialGameStarsGoal = 1000;
+
   /// Um jogo (fase) só fica jogável se seu índice em [kGameOrder] for menor
-  /// que [unlockedPhase] (a fase 1 é sempre liberada).
+  /// que [unlockedPhase] (a fase 1 é sempre liberada). O jogo especial não
+  /// entra em [kGameOrder] — sua liberação depende só do total de estrelas.
   bool isUnlocked(String gameId) {
+    if (gameId == kSpecialGameId) return lifetimeStars >= specialGameStarsGoal;
     final index = kGameOrder.indexOf(gameId);
     if (index < 0) return true;
     return index < unlockedPhase;
