@@ -9,7 +9,7 @@ import 'services/purchase_service.dart';
 import 'services/tts_service.dart';
 import 'theme/app_theme.dart';
 import 'widgets/mute_button.dart';
-import 'widgets/voice_button.dart';
+import 'widgets/star_counter_badge.dart';
 
 class EspertinhosApp extends StatelessWidget {
   const EspertinhosApp({super.key});
@@ -33,13 +33,21 @@ class EspertinhosApp extends StatelessWidget {
           return Stack(
             children: [
               if (child != null) child,
-              const Align(
+              Align(
                 alignment: Alignment.topRight,
-                child: MuteButton(),
-              ),
-              const Align(
-                alignment: Alignment.topLeft,
-                child: VoiceButton(),
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 8, right: 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: const [
+                        StarCounterBadge(),
+                        SizedBox(height: 8),
+                        MuteButton(),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ],
           );

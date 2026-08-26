@@ -15,6 +15,7 @@ class AdsService {
   InterstitialAd? _interstitialAd;
   bool _loading = false;
   Timer? _retryTimer;
+  VoidCallback? _onAdReady;
 
   Future<void> init() async {
     await MobileAds.instance.initialize();
@@ -44,6 +45,7 @@ class AdsService {
         onAdLoaded: (ad) {
           _loading = false;
           _interstitialAd = ad;
+          _onAdReady?.call();
         },
         onAdFailedToLoad: (_) {
           _loading = false;
@@ -80,6 +82,33 @@ class AdsService {
     );
     _interstitialAd = null;
     ad.show();
+  }
+
+  /// Como [showIfReady], mas não desiste na hora se o anúncio ainda não
+  /// tiver carregado — continua esperando até ele ficar pronto (e mostra
+  /// assim que chegar) ou até [timeout] passar. Usado quando o anúncio é
+  /// obrigatório: com internet boa, o anúncio costuma chegar em poucos
+  /// segundos, bem antes do prazo — sem isso, a criança esperava o tempo
+  /// máximo inteiro mesmo com internet ótima, só porque o anúncio não
+  /// tinha carregado no exato instante em que a fase terminou.
+  void showWhenReady({required Duration timeout, required void Function(bool shown) onDone}) {
+    if (_interstitialAd != null) {
+      showIfReady(onClosed: () => onDone(true));
+      return;
+    }
+    _loadInterstitial();
+    var done = false;
+    Timer? timeoutTimer;
+    void finish(bool shown) {
+      if (done) return;
+      done = true;
+      _onAdReady = null;
+      timeoutTimer?.cancel();
+      onDone(shown);
+    }
+
+    _onAdReady = () => showIfReady(onClosed: () => finish(true));
+    timeoutTimer = Timer(timeout, () => finish(false));
   }
 
   void dispose() {

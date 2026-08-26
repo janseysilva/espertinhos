@@ -19,11 +19,13 @@ import '../models/age_group.dart';
 import '../models/game_def.dart';
 import '../services/app_state.dart';
 import '../services/purchase_service.dart';
+import '../services/tts_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/admin_lock_dialog.dart';
 import '../widgets/app_background.dart';
 import '../widgets/mascot.dart';
 import '../widgets/squishy_button.dart';
+import '../widgets/voice_settings_dialog.dart';
 import 'age_select_screen.dart';
 
 final List<GameDef> kGames = [
@@ -240,22 +242,22 @@ class HomeScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    StreamBuilder<int>(
-                      stream: appState.lifetimeStarsStream,
-                      builder: (context, snap) {
-                        final total = snap.data ?? 0;
-                        return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: AppColors.gold.withValues(alpha: 0.9),
-                            borderRadius: BorderRadius.circular(999),
+                    SquishyButton(
+                      color: Colors.white.withValues(alpha: 0.85),
+                      borderRadius: 999,
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      onTap: () => showVoiceSettingsDialog(context, context.read<TtsService>()),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('🗣️', style: TextStyle(fontSize: 14)),
+                          SizedBox(width: 6),
+                          Text(
+                            'Voz',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent, fontSize: 12),
                           ),
-                          child: Text(
-                            '🌟 $total / 500',
-                            style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textDark, fontSize: 12),
-                          ),
-                        );
-                      },
+                        ],
+                      ),
                     ),
                     if (!purchases.adsRemoved)
                       SquishyButton(

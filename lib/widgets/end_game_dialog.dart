@@ -82,24 +82,23 @@ class _EndGameResultDialogState extends State<EndGameResultDialog> {
     final ads = context.read<AdsService>();
     final music = context.read<MusicService>();
     await music.pauseForAd();
-    ads.showIfReady(
-      onClosed: () {
+    // Com internet boa, o anúncio costuma ficar pronto em poucos segundos
+    // — showWhenReady mostra assim que ele chegar, em vez de esperar o
+    // prazo máximo sempre. A contagem abaixo é só visual (mostra quanto
+    // tempo falta pro prazo, caso o anúncio demore ou não chegue).
+    ads.showWhenReady(
+      timeout: const Duration(seconds: _adWaitSeconds),
+      onDone: (_) {
         music.resumeIfNeeded();
         _countdownTimer?.cancel();
         if (mounted) setState(() => _canContinue = true);
       },
     );
-    // Se não tinha anúncio pronto (sem internet, por exemplo), showIfReady
-    // não chama onClosed — a contagem regressiva libera a criança mesmo
-    // assim ao chegar em zero, em vez de travar o app pra sempre.
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) return;
       if (_secondsLeft <= 1) {
         timer.cancel();
-        setState(() {
-          _secondsLeft = 0;
-          _canContinue = true;
-        });
+        setState(() => _secondsLeft = 0);
       } else {
         setState(() => _secondsLeft--);
       }
