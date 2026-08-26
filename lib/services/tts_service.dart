@@ -106,26 +106,39 @@ class TtsService {
   /// antemão quais existem; o app pergunta direto pro sistema. Fica de
   /// fora qualquer voz de outro português (ex: Portugal), pra não confundir
   /// a criança com uma pronúncia diferente da que ela conhece.
+  ///
+  /// Motores como o do Google costumam listar a MESMA pessoa/voz duas vezes
+  /// — uma versão "-local" (funciona offline) e uma "-network" (precisa de
+  /// internet, geralmente mais natural) — o que parecia "voz repetida" pra
+  /// quem tá escolhendo. Aqui elas são agrupadas como uma coisa só,
+  /// preferindo a "-local" (funciona sem internet, mais confiável pra
+  /// criança no meio de um jogo).
   Future<List<Map<String, String>>> listPortugueseVoices() async {
     await _ensureReady();
     try {
       final raw = await _tts.getVoices;
-      final voices = <Map<String, String>>[];
-      final seenNames = <String>{};
+      final byGroup = <String, Map<String, String>>{};
       for (final v in (raw as List)) {
-        if (v is Map) {
-          final name = v['name']?.toString();
-          final locale = v['locale']?.toString();
-          final normalizedLocale = locale?.toLowerCase().replaceAll('_', '-');
-          if (name != null &&
-              normalizedLocale != null &&
-              normalizedLocale.startsWith('pt-br') &&
-              seenNames.add(name)) {
-            voices.add({'name': name, 'locale': locale!});
-          }
+        if (v is! Map) continue;
+        final name = v['name']?.toString();
+        final locale = v['locale']?.toString();
+        final normalizedLocale = locale?.toLowerCase().replaceAll('_', '-');
+        if (name == null || normalizedLocale == null || !normalizedLocale.startsWith('pt-br')) {
+          continue;
+        }
+        final match = RegExp(r'^(.*?)-(local|network)$', caseSensitive: false).firstMatch(name);
+        final groupKey = (match?.group(1) ?? name).toLowerCase();
+        final quality = match?.group(2)?.toLowerCase();
+        final existing = byGroup[groupKey];
+        // Se já tem uma versão desse grupo guardada, só troca se a nova for
+        // "local" e a guardada não for (senão mantém a primeira encontrada).
+        final existingIsLocal = existing != null &&
+            RegExp(r'-local$', caseSensitive: false).hasMatch(existing['name']!);
+        if (existing == null || (quality == 'local' && !existingIsLocal)) {
+          byGroup[groupKey] = {'name': name, 'locale': locale!};
         }
       }
-      voices.sort((a, b) => a['name']!.compareTo(b['name']!));
+      final voices = byGroup.values.toList()..sort((a, b) => a['name']!.compareTo(b['name']!));
       return voices;
     } catch (_) {
       return [];
