@@ -33,16 +33,19 @@ class EspertinhosApp extends StatelessWidget {
           return Stack(
             children: [
               if (child != null) child,
-              const Align(
-                alignment: Alignment.topLeft,
-                child: MuteButton(),
-              ),
               Align(
                 alignment: Alignment.topRight,
                 child: SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 8, right: 12),
-                    child: StarCounterBadge(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: const [
+                        StarCounterBadge(),
+                        SizedBox(height: 8),
+                        MuteButton(),
+                      ],
+                    ),
                   ),
                 ),
               ),

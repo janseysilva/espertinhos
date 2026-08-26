@@ -18,14 +18,17 @@ class StarCounterBadge extends StatelessWidget {
         final total = snap.data ?? 0;
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: AppColors.gold.withValues(alpha: 0.9),
-            borderRadius: BorderRadius.circular(999),
+          decoration: const BoxDecoration(
+            color: AppColors.gold,
+            borderRadius: BorderRadius.all(Radius.circular(999)),
           ),
           // Emoji e número em Text separados (não numa string só) — juntos
           // numa única peça de texto em negrito, alguns celulares (ex:
           // Xiaomi/MIUI) desenhavam um traço embaixo por confusão de fonte
-          // na hora de misturar o emoji com o texto.
+          // na hora de misturar o emoji com o texto. Cor de fundo também
+          // virou opaca (sem transparência) — uma cor semitransparente
+          // colorida (diferente do resto dos botões do app, que usam
+          // branco) é mais propensa a esse tipo de artefato de desenho.
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [

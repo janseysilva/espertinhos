@@ -308,10 +308,10 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             Align(
-              alignment: Alignment.topLeft,
+              alignment: Alignment.topRight,
               child: SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 56, left: 12),
+                  padding: const EdgeInsets.only(top: 100, right: 12),
                   child: Material(
                     color: Colors.white.withValues(alpha: 0.85),
                     shape: const CircleBorder(),
