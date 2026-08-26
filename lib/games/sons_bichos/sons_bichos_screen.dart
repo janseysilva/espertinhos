@@ -75,11 +75,15 @@ class _SonsBichosScreenState extends State<SonsBichosScreen> {
   bool locked = false;
   late _Animal target;
   late List<_Animal> options;
+  final usedTargets = <_Animal>{};
 
   @override
   void initState() {
     super.initState();
-    final animalCount = switch (widget.age.level) { 0 => 4, 1 => 7, _ => 10 };
+    // Precisa de pelo menos tantos bichos quanto rodadas na partida
+    // (age.starsToAdvance: 5/6/8), senão não dá pra evitar repetir a
+    // mesma pergunta na faixa mais nova.
+    final animalCount = switch (widget.age.level) { 0 => 5, 1 => 7, _ => 10 };
     optionCount = switch (widget.age.level) { 0 => 4, 1 => 6, _ => 8 };
     pool = _Animal.values.take(animalCount).toList();
     totalRounds = widget.age.starsToAdvance;
@@ -94,7 +98,9 @@ class _SonsBichosScreenState extends State<SonsBichosScreen> {
 
   void _newRound() {
     final random = Random();
-    target = pool[random.nextInt(pool.length)];
+    final available = pool.where((a) => !usedTargets.contains(a)).toList();
+    target = available[random.nextInt(available.length)];
+    usedTargets.add(target);
     final chosen = <_Animal>{target};
     while (chosen.length < optionCount && chosen.length < pool.length) {
       chosen.add(pool[random.nextInt(pool.length)]);
@@ -119,6 +125,7 @@ class _SonsBichosScreenState extends State<SonsBichosScreen> {
       mistakes = 0;
       feedback = null;
       locked = false;
+      usedTargets.clear();
       _newRound();
     });
   }

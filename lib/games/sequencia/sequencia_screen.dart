@@ -20,6 +20,11 @@ class SequenciaScreen extends StatelessWidget {
     };
     final unitLenRange = switch (age.level) { 0 => (2, 2), 1 => (2, 3), _ => (3, 4) };
     final displayLen = switch (age.level) { 0 => 5, 1 => 7, _ => 9 };
+    // Guarda os padrões já perguntados nessa partida (pela cor, não pela
+    // "resposta" — o padrão de repetição raramente tem cores suficientes
+    // pra nunca repetir a resposta certa), pra nunca repetir o mesmo
+    // desenho de sequência em rodadas diferentes.
+    final usedPatterns = <String>{};
 
     return ChoiceGameScreen(
       gameId: 'sequencia',
@@ -28,10 +33,18 @@ class SequenciaScreen extends StatelessWidget {
       gridCrossAxisCount: palette.length <= 3 ? 3 : 4,
       optionAspectRatio: 1.0,
       roundGenerator: (round) {
+        if (round == 0) usedPatterns.clear();
         final random = Random();
-        final unitLen = unitLenRange.$1 +
-            (unitLenRange.$2 > unitLenRange.$1 ? random.nextInt(unitLenRange.$2 - unitLenRange.$1 + 1) : 0);
-        final unit = List.generate(unitLen, (_) => palette[random.nextInt(palette.length)]);
+        List<Color> unit;
+        var attempts = 0;
+        do {
+          attempts++;
+          final unitLen = unitLenRange.$1 +
+              (unitLenRange.$2 > unitLenRange.$1 ? random.nextInt(unitLenRange.$2 - unitLenRange.$1 + 1) : 0);
+          unit = List.generate(unitLen, (_) => palette[random.nextInt(palette.length)]);
+        } while (attempts < 100 && usedPatterns.contains(unit.map((c) => c.toARGB32()).join(',')));
+        usedPatterns.add(unit.map((c) => c.toARGB32()).join(','));
+        final unitLen = unit.length;
         final sequence = List.generate(displayLen, (i) => unit[i % unitLen]);
         final next = unit[displayLen % unitLen];
 

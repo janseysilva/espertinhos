@@ -43,9 +43,15 @@ class FamiliaScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final membroCount = switch (age.level) { 0 => 4, 1 => 6, _ => 8 };
+    // Precisa de pelo menos tantos membros quanto rodadas na partida
+    // (age.starsToAdvance: 5/6/8), senão não dá pra evitar repetir a
+    // mesma pergunta na faixa mais nova.
+    final membroCount = switch (age.level) { 0 => 5, 1 => 7, _ => 8 };
     final optionCount = switch (age.level) { 0 => 4, 1 => 6, _ => 8 };
     final membros = _Membro.values.take(membroCount).toList();
+    // Guarda os membros já perguntados nessa partida, pra nunca repetir a
+    // mesma pergunta em rodadas diferentes.
+    final usedTargets = <_Membro>{};
 
     return ChoiceGameScreen(
       gameId: kSpecialGameId,
@@ -54,8 +60,11 @@ class FamiliaScreen extends StatelessWidget {
       gridCrossAxisCount: optionCount <= 4 ? 2 : 3,
       optionAspectRatio: 1.1,
       roundGenerator: (round) {
+        if (round == 0) usedTargets.clear();
         final random = Random();
-        final target = membros[random.nextInt(membros.length)];
+        final available = membros.where((m) => !usedTargets.contains(m)).toList();
+        final target = available[random.nextInt(available.length)];
+        usedTargets.add(target);
 
         final chosen = <_Membro>{target};
         while (chosen.length < optionCount && chosen.length < membros.length) {

@@ -13,6 +13,9 @@ class MaiorMenorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final maxN = switch (age.level) { 0 => 10, 1 => 30, _ => 100 };
+    // Guarda os pares de números já perguntados nessa partida, pra nunca
+    // repetir a mesma dupla em rodadas diferentes.
+    final usedPairs = <(int, int)>{};
 
     return ChoiceGameScreen(
       gameId: 'maior_menor',
@@ -21,13 +24,18 @@ class MaiorMenorScreen extends StatelessWidget {
       gridCrossAxisCount: 2,
       optionAspectRatio: 1.3,
       roundGenerator: (round) {
+        if (round == 0) usedPairs.clear();
         final random = Random();
         final askBigger = round.isEven;
-        var a = 1 + random.nextInt(maxN);
-        var b = 1 + random.nextInt(maxN);
-        while (b == a) {
+        int a, b;
+        do {
+          a = 1 + random.nextInt(maxN);
           b = 1 + random.nextInt(maxN);
-        }
+          while (b == a) {
+            b = 1 + random.nextInt(maxN);
+          }
+        } while (usedPairs.contains((min(a, b), max(a, b))));
+        usedPairs.add((min(a, b), max(a, b)));
         final correct = askBigger ? max(a, b) : min(a, b);
 
         final text = askBigger ? 'Toque no número MAIOR' : 'Toque no número MENOR';

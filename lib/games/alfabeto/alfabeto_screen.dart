@@ -16,16 +16,24 @@ class AlfabetoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final optionCount = switch (age.level) { 0 => 3, 1 => 4, _ => 4 };
     final trapMode = age.level == 2;
+    final totalRounds = age.starsToAdvance;
+    // Sorteia as letras da partida inteira de uma vez só (sem repetir),
+    // em vez de sortear rodada por rodada.
+    List<String>? roundLetters;
 
     return ChoiceGameScreen(
       gameId: 'alfabeto',
       title: 'Alfabeto',
-      totalRounds: age.starsToAdvance,
+      totalRounds: totalRounds,
       gridCrossAxisCount: 2,
       optionAspectRatio: 1.6,
       roundGenerator: (round) {
+        if (round == 0 || roundLetters == null) {
+          final pool = _letters.split('')..shuffle();
+          roundLetters = pool.take(totalRounds).toList();
+        }
         final random = Random();
-        final targetLetter = _letters[random.nextInt(_letters.length)];
+        final targetLetter = roundLetters![round];
         final wantUpper = trapMode ? random.nextBool() : true;
 
         final String promptText;

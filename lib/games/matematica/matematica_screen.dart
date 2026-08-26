@@ -17,6 +17,9 @@ class MatematicaScreen extends StatelessWidget {
     final maxSum = switch (age.level) { 0 => 5, 1 => 9, _ => 20 };
     final allowSubtraction = age.level >= 1;
     final useIcons = age.level <= 1;
+    // Guarda as contas já perguntadas nessa partida, pra nunca repetir a
+    // mesma conta em rodadas diferentes — zera de novo a cada reinício.
+    final usedEquations = <(int, int, bool)>{};
 
     return ChoiceGameScreen(
       gameId: 'matematica',
@@ -25,18 +28,27 @@ class MatematicaScreen extends StatelessWidget {
       gridCrossAxisCount: 3,
       optionAspectRatio: 1.0,
       roundGenerator: (round) {
+        if (round == 0) usedEquations.clear();
         final random = Random();
-        final isSubtraction = allowSubtraction && random.nextBool();
+        var isSubtraction = allowSubtraction && random.nextBool();
         int a, b, result;
-        if (isSubtraction) {
-          a = 2 + random.nextInt(maxSum - 1);
-          b = 1 + random.nextInt(a - 1);
-          result = a - b;
-        } else {
-          result = 2 + random.nextInt(maxSum - 1);
-          a = 1 + random.nextInt(result - 1);
-          b = result - a;
-        }
+        var attempts = 0;
+        do {
+          attempts++;
+          isSubtraction = allowSubtraction && random.nextBool();
+          if (isSubtraction) {
+            a = 2 + random.nextInt(maxSum - 1);
+            b = 1 + random.nextInt(a - 1);
+            result = a - b;
+          } else {
+            result = 2 + random.nextInt(maxSum - 1);
+            a = 1 + random.nextInt(result - 1);
+            b = result - a;
+          }
+          // Depois de muitas tentativas, aceita repetir (evita travar caso
+          // o espaço de contas possíveis seja pequeno demais nessa faixa).
+        } while (attempts < 100 && usedEquations.contains((a, b, isSubtraction)));
+        usedEquations.add((a, b, isSubtraction));
         final emoji = _objects[random.nextInt(_objects.length)];
         final opSymbol = isSubtraction ? '−' : '+';
 

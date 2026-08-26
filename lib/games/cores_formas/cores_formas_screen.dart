@@ -50,6 +50,9 @@ class CoresFormasScreen extends StatelessWidget {
     final optionCount = switch (age.level) { 0 => 4, 1 => 6, _ => 8 };
     final shapes = _Shape.values.take(shapeCount).toList();
     final colorNames = _colors.keys.take(colorCount).toList();
+    // Guarda os alvos já perguntados nessa partida, pra nunca repetir a
+    // mesma pergunta em rodadas diferentes — zera de novo a cada reinício.
+    final usedTargets = <(_Shape, String)>{};
 
     return ChoiceGameScreen(
       gameId: 'cores_formas',
@@ -58,9 +61,15 @@ class CoresFormasScreen extends StatelessWidget {
       gridCrossAxisCount: optionCount <= 4 ? 2 : 3,
       optionAspectRatio: 1.1,
       roundGenerator: (round) {
+        if (round == 0) usedTargets.clear();
         final random = Random();
-        final targetShape = shapes[random.nextInt(shapes.length)];
-        final targetColor = colorNames[random.nextInt(colorNames.length)];
+        (_Shape, String) targetCombo;
+        do {
+          targetCombo = (shapes[random.nextInt(shapes.length)], colorNames[random.nextInt(colorNames.length)]);
+        } while (usedTargets.contains(targetCombo));
+        usedTargets.add(targetCombo);
+        final targetShape = targetCombo.$1;
+        final targetColor = targetCombo.$2;
 
         final combos = <(_Shape, String)>{(targetShape, targetColor)};
         while (combos.length < optionCount) {

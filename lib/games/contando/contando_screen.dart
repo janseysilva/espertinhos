@@ -19,16 +19,25 @@ class ContandoScreen extends StatelessWidget {
       1 => (4, 9),
       _ => (10, 20),
     };
+    final totalRounds = age.starsToAdvance;
+    // Sorteia a sequência de números da partida inteira de uma vez só (sem
+    // repetir nenhum), em vez de sortear rodada por rodada — evita que a
+    // mesma contagem apareça duas vezes na mesma partida.
+    List<int>? roundTargets;
 
     return ChoiceGameScreen(
       gameId: 'contando',
       title: 'Contando',
-      totalRounds: age.starsToAdvance,
+      totalRounds: totalRounds,
       gridCrossAxisCount: 3,
       optionAspectRatio: 1.0,
       roundGenerator: (round) {
+        if (round == 0 || roundTargets == null) {
+          final pool = List.generate(maxN - minN + 1, (i) => minN + i)..shuffle();
+          roundTargets = pool.take(totalRounds).toList();
+        }
         final random = Random();
-        final target = minN + random.nextInt(maxN - minN + 1);
+        final target = roundTargets![round];
         final emoji = _objects[random.nextInt(_objects.length)];
 
         final distractors = <int>{target};
