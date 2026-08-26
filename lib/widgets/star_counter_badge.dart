@@ -30,7 +30,7 @@ class StarCounterBadge extends StatelessWidget {
                 const Icon(Icons.star_rounded, color: AppColors.starOn, size: 15),
                 const SizedBox(width: 4),
                 Text(
-                  '$total de 500',
+                  '$total de 1000',
                   style: const TextStyle(
                     fontWeight: FontWeight.w700,
                     color: AppColors.textDark,
