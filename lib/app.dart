@@ -22,7 +22,7 @@ class EspertinhosApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => MusicService()..init()),
         Provider(create: (_) => AdsService()..init(), dispose: (_, service) => service.dispose()),
         ChangeNotifierProvider(create: (_) => PurchaseService()..init()),
-        Provider(create: (_) => TtsService()),
+        Provider(create: (_) => TtsService()..warmUp()),
       ],
       child: MaterialApp(
         title: 'Espertinhos',
@@ -33,19 +33,16 @@ class EspertinhosApp extends StatelessWidget {
           return Stack(
             children: [
               if (child != null) child,
+              const Align(
+                alignment: Alignment.topLeft,
+                child: MuteButton(),
+              ),
               Align(
                 alignment: Alignment.topRight,
                 child: SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 8, right: 12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: const [
-                        StarCounterBadge(),
-                        SizedBox(height: 8),
-                        MuteButton(),
-                      ],
-                    ),
+                    child: StarCounterBadge(),
                   ),
                 ),
               ),

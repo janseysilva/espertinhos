@@ -186,11 +186,13 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: AppBackground(
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-            child: Column(
-              children: [
+        child: Stack(
+          children: [
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                child: Column(
+                  children: [
                 const Mascot(size: 64),
                 const SizedBox(height: 6),
                 const Text(
@@ -237,23 +239,6 @@ class HomeScreen extends StatelessWidget {
                           SizedBox(width: 6),
                           Text(
                             'Resetar fases',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent, fontSize: 12),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SquishyButton(
-                      color: Colors.white.withValues(alpha: 0.85),
-                      borderRadius: 999,
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                      onTap: () => showVoiceSettingsDialog(context, context.read<TtsService>()),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text('🗣️', style: TextStyle(fontSize: 14)),
-                          SizedBox(width: 6),
-                          Text(
-                            'Voz',
                             style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent, fontSize: 12),
                           ),
                         ],
@@ -318,9 +303,32 @@ class HomeScreen extends StatelessWidget {
                     },
                   ),
                 ),
-              ],
+                  ],
+                ),
+              ),
             ),
-          ),
+            Align(
+              alignment: Alignment.topRight,
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 52, right: 12),
+                  child: Material(
+                    color: Colors.white.withValues(alpha: 0.85),
+                    shape: const CircleBorder(),
+                    elevation: 3,
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: () => showVoiceSettingsDialog(context, context.read<TtsService>()),
+                      child: const Padding(
+                        padding: EdgeInsets.all(9),
+                        child: Text('🗣️', style: TextStyle(fontSize: 18)),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

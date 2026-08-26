@@ -29,17 +29,36 @@ class _VoiceSettingsDialog extends StatefulWidget {
 class _VoiceSettingsDialogState extends State<_VoiceSettingsDialog> {
   List<Map<String, String>>? _voices;
   Map<String, String>? _selected;
+  List<String>? _engines;
+  String? _selectedEngine;
 
   @override
   void initState() {
     super.initState();
     _selected = widget.tts.selectedVoice;
+    _selectedEngine = widget.tts.selectedEngine;
+    _loadEngines();
     _load();
+  }
+
+  Future<void> _loadEngines() async {
+    final engines = await widget.tts.listEngines();
+    if (mounted) setState(() => _engines = engines);
   }
 
   Future<void> _load() async {
     final voices = await widget.tts.listPortugueseVoices();
     if (mounted) setState(() => _voices = voices);
+  }
+
+  Future<void> _chooseEngine(String? engine) async {
+    setState(() {
+      _selectedEngine = engine;
+      _selected = null;
+      _voices = null;
+    });
+    await widget.tts.setPreferredEngine(engine);
+    await _load();
   }
 
   Future<void> _choose(Map<String, String>? voice) async {
@@ -76,6 +95,34 @@ class _VoiceSettingsDialogState extends State<_VoiceSettingsDialog> {
               style: TextStyle(fontSize: 13, color: Colors.black54),
             ),
             const SizedBox(height: 16),
+            if (_engines != null && _engines!.length > 1) ...[
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Motor de voz',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black.withValues(alpha: 0.6)),
+                ),
+              ),
+              const SizedBox(height: 6),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  _EngineChip(
+                    label: 'Padrão',
+                    selected: _selectedEngine == null,
+                    onTap: () => _chooseEngine(null),
+                  ),
+                  for (final e in _engines!)
+                    _EngineChip(
+                      label: e.contains('.') ? e.split('.').last : e,
+                      selected: _selectedEngine == e,
+                      onTap: () => _chooseEngine(e),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 14),
+            ],
             Flexible(
               child: _voices == null
                   ? const Padding(
@@ -170,6 +217,37 @@ class _VoiceTile extends StatelessWidget {
                 ),
                 if (selected) const Icon(Icons.check_circle, color: AppColors.success, size: 18),
               ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EngineChip extends StatelessWidget {
+  const _EngineChip({required this.label, required this.selected, required this.onTap});
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: selected ? AppColors.accent : const Color(0xFFF5F3FF),
+      borderRadius: BorderRadius.circular(999),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(999),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: selected ? Colors.white : AppColors.textDark,
             ),
           ),
         ),
