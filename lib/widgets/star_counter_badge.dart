@@ -22,9 +22,20 @@ class StarCounterBadge extends StatelessWidget {
             color: AppColors.gold.withValues(alpha: 0.9),
             borderRadius: BorderRadius.circular(999),
           ),
-          child: Text(
-            '🌟 $total / 500',
-            style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textDark, fontSize: 12),
+          // Emoji e número em Text separados (não numa string só) — juntos
+          // numa única peça de texto em negrito, alguns celulares (ex:
+          // Xiaomi/MIUI) desenhavam um traço embaixo por confusão de fonte
+          // na hora de misturar o emoji com o texto.
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('🌟', style: TextStyle(fontSize: 12)),
+              const SizedBox(width: 4),
+              Text(
+                '$total / 500',
+                style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textDark, fontSize: 12),
+              ),
+            ],
           ),
         );
       },
