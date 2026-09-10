@@ -9,14 +9,15 @@ App educativo infantil "Espertinhos" — 15 jogos: os 12 originais (Cores e Form
 
 **Stack definitivo (decidido 2026-08-11):** Flutter + Firebase (login anônimo via Firebase Auth, dados na nuvem via Cloud Firestore, projeto Firebase `espertinhos-app-2026`). A versão antiga em HTML/JS/PWA (pasta `app-educativo-kids` dentro de `trabalhos jansey`) está **descontinuada** — não retomar sem o Jansey pedir.
 
-## Status atual (2026-09-07)
+## Status atual (2026-09-09)
 - Versão do código: **1.3.0+4**. App completo, testado (teste interno + teste fechado "alpha" no Play Console), com anúncios reais do AdMob (obrigatórios após cada fase) e compra "remover anúncios" via in-app purchase.
 - Firebase conectado de verdade (login anônimo + Firestore).
-- **App enviado para revisão de produção do Google Play em 2026-09-07**, disponibilidade limitada ao **Brasil**. Revisão costuma levar até 7 dias, pode demorar mais. Conferir o painel antes de assumir o status: https://play.google.com/console/u/1/developers/6269272435347218782/app/4975464292977682277/app-dashboard
+- **Primeiro envio pra produção (07/09) foi REJEITADO em 09/09** por dois motivos no Status da política do Play Console: (1) "Não adesão às Políticas do programa para desenvolvedores" (genérico, sem causa própria) e (2) "Política de Privacidade inválida — exige login". A causa real era a (2): o artifact da política de privacidade estava **privado** no Claude, então o revisor do Google caía numa tela de login. **Corrigido em 09/09:** artifact tornado público ("Anyone with the link") e o texto atualizado pra refletir a realidade atual do app (anúncios reais do AdMob e compra de remoção — a versão antiga do texto ainda dizia "não exibe anúncios", o que teria causado uma segunda rejeição por descompasso com a Segurança dos Dados). **Reenviado pra revisão em 09/09.**
+- Conferir o painel antes de assumir o status: https://play.google.com/console/u/1/developers/6269272435347218782/app/4975464292977682277/app-dashboard — e o Status da política em caso de nova rejeição: .../policy-center
 - Conta Google Play Console e conta AdMob **já existem e já estão configuradas** — não são mais pendências.
 
 ## Rumo à publicação na Google Play — checklist
-- **Política de Privacidade:** escrita e publicada. Artifact: https://claude.ai/code/artifact/fd100547-577c-4254-9a2a-2dea75f1a5d4 — contato Jansey Silva / janseysilva@gmail.com.
+- **Política de Privacidade:** escrita, publicada e **agora pública de verdade** (compartilhamento "Anyone with the link" ativado em 09/09 — antes estava só "Only you", causa da rejeição acima). Artifact: https://claude.ai/code/artifact/fd100547-577c-4254-9a2a-2dea75f1a5d4 — contato Jansey Silva / janseysilva@gmail.com. **Se o texto do app mudar de novo (novo tipo de anúncio, nova coleta de dado, etc.), atualizar este artifact e conferir que continua compartilhado publicamente antes de reenviar pro Play Console.**
 - **Ícone do app:** feito — emoji real 🐰 recortado sobre o degradê do app, ícone legado + adaptativo (Android 8+). Ícone 512x512 em `materiais-loja/icone_playstore_512.png`.
 - **Guia "Segurança dos Dados" (Data Safety):** pronto em `materiais-loja/seguranca-dos-dados.md`.
 - **Capturas de tela (5) e imagem de destaque (1024x500):** em `materiais-loja/capturas-tela/` e `materiais-loja/feature_graphic.jpg` — ainda são recriações via HTML/Canvas, **não** screenshots reais do app rodando. Trocar pelas reais quando possível (não bloqueia a revisão do Google, mas fica melhor).
@@ -26,7 +27,7 @@ App educativo infantil "Espertinhos" — 15 jogos: os 12 originais (Cores e Form
 - Build usada na promoção pra produção foi o App Bundle (`.aab`) gerado automaticamente pelo Play Console a partir da build 4 (1.3.0) do teste fechado — não precisou gerar manualmente.
 
 ## Pendente
-- Acompanhar o resultado da revisão do Google (aprovação, rejeição ou pedido de ajuste).
+- Acompanhar o resultado da nova revisão do Google (aprovação, rejeição ou pedido de ajuste) enviada em 09/09.
 - Trocar as capturas de tela da loja pelas reais do app rodando, quando for conveniente.
 - Considerar expandir a disponibilidade pra outros países além do Brasil, se o Jansey quiser.
 
