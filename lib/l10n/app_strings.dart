@@ -72,6 +72,12 @@ class AppStrings {
         AppLanguage.es => '· cambiar',
       };
 
+  String get changeLanguageLabel => switch (lang) {
+        AppLanguage.ptBr || AppLanguage.ptPt => 'Idioma',
+        AppLanguage.en => 'Language',
+        AppLanguage.es => 'Idioma',
+      };
+
   String get resetPhasesLabel => switch (lang) {
         AppLanguage.ptBr || AppLanguage.ptPt => 'Resetar fases',
         AppLanguage.en => 'Reset phases',

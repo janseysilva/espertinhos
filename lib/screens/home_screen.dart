@@ -33,6 +33,7 @@ import '../widgets/mascot.dart';
 import '../widgets/squishy_button.dart';
 import '../widgets/voice_settings_dialog.dart';
 import 'age_select_screen.dart';
+import 'language_select_screen.dart';
 
 final List<GameDef> kGames = [
   GameDef(
@@ -171,6 +172,14 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _changeLanguage(BuildContext context) async {
+    final ok = await showAdminLockDialog(context);
+    if (!ok || !context.mounted) return;
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const LanguageSelectScreen(fromSettings: true)),
+    );
+  }
+
   Future<void> _resetPhases(BuildContext context) async {
     final t = stringsOf(context);
     final ok = await showAdminLockDialog(context);
@@ -265,6 +274,23 @@ class HomeScreen extends StatelessWidget {
                       color: Colors.white.withValues(alpha: 0.85),
                       borderRadius: 999,
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      onTap: () => _changeLanguage(context),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(appState.language?.flag ?? AppLanguage.ptBr.flag, style: const TextStyle(fontSize: 14)),
+                          const SizedBox(width: 6),
+                          Text(
+                            t.changeLanguageLabel,
+                            style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SquishyButton(
+                      color: Colors.white.withValues(alpha: 0.85),
+                      borderRadius: 999,
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                       onTap: () => _resetPhases(context),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -306,7 +332,11 @@ class HomeScreen extends StatelessWidget {
                       crossAxisCount: 2,
                       mainAxisSpacing: 14,
                       crossAxisSpacing: 14,
-                      childAspectRatio: 1.05,
+                      // Um pouco mais baixo que quadrado (era 1.05) pra sobrar
+                      // altura pros títulos traduzidos mais compridos (ex:
+                      // "Encuentra la Diferencia", "Sonidos de Animales" em
+                      // espanhol) não estourarem o cartão em 2 linhas.
+                      childAspectRatio: 0.92,
                     ),
                     itemCount: kGames.length + 1,
                     itemBuilder: (context, i) {
@@ -426,13 +456,15 @@ class _GameTile extends StatelessWidget {
             unlocked
                 ? _WigglingEmoji(emoji: game.emoji, delayMs: (index % 4) * 350)
                 : Icon(Icons.lock_rounded, size: 34, color: Colors.grey.shade500),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               t.gameTitle(game.id),
               textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 15,
+                fontSize: 14,
                 color: unlocked ? AppColors.textDark : Colors.grey.shade600,
               ),
             ),
