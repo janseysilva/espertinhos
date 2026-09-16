@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_strings.dart';
 import '../../models/age_group.dart';
 import '../../widgets/choice_game_scaffold.dart';
 
@@ -14,6 +15,7 @@ class AlfabetoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = stringsOf(context);
     final optionCount = switch (age.level) { 0 => 3, 1 => 4, _ => 4 };
     final trapMode = age.level == 2;
     final totalRounds = age.starsToAdvance;
@@ -39,11 +41,10 @@ class AlfabetoScreen extends StatelessWidget {
         final String promptText;
         final String correctDisplay;
         if (trapMode) {
-          promptText =
-              'Toque na letra "$targetLetter" ${wantUpper ? "MAIÚSCULA" : "minúscula"}';
+          promptText = t.alfabetoPrompt(targetLetter, wantUpper: wantUpper);
           correctDisplay = wantUpper ? targetLetter : targetLetter.toLowerCase();
         } else {
-          promptText = 'Toque na letra "$targetLetter"';
+          promptText = t.alfabetoPrompt(targetLetter);
           correctDisplay = targetLetter;
         }
 

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_strings.dart';
 import '../../models/age_group.dart';
 import '../../widgets/choice_game_scaffold.dart';
 
@@ -14,6 +15,7 @@ class ContandoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = stringsOf(context);
     final (minN, maxN) = switch (age.level) {
       0 => (1, 5),
       1 => (4, 9),
@@ -51,9 +53,9 @@ class ContandoScreen extends StatelessWidget {
         return RoundData(
           prompt: Column(
             children: [
-              const Text(
-                'Quantos você vê?',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+              Text(
+                t.contandoPrompt,
+                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 12),
               Wrap(
@@ -67,7 +69,7 @@ class ContandoScreen extends StatelessWidget {
               ),
             ],
           ),
-          promptText: 'Quantos você vê?',
+          promptText: t.contandoPrompt,
           options: choices
               .map(
                 (n) => ChoiceOption(

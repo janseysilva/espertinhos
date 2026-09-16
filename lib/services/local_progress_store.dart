@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/age_group.dart';
+import '../models/app_language.dart';
 
 /// Guarda a faixa etária escolhida e as fases desbloqueadas direto no
 /// aparelho (sem depender de rede). É a fonte da verdade pro que a criança
@@ -12,7 +13,20 @@ class LocalProgressStore {
   static const _ageGroupKey = 'localAgeGroupId';
   static const _childNameKey = 'localChildName';
   static const _lifetimeStarsKey = 'localLifetimeStars';
+  static const _languageKey = 'localLanguageId';
   static String _phaseKey(String ageId) => 'localUnlockedPhase_$ageId';
+
+  Future<AppLanguage?> loadLanguage() async {
+    final prefs = await SharedPreferences.getInstance();
+    final id = prefs.getString(_languageKey);
+    if (id == null) return null;
+    return AppLanguageX.fromId(id);
+  }
+
+  Future<void> saveLanguage(AppLanguage language) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_languageKey, language.id);
+  }
 
   Future<String?> loadChildName() async {
     final prefs = await SharedPreferences.getInstance();

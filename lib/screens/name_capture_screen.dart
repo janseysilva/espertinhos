@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/app_strings.dart';
 import '../services/app_state.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_background.dart';
@@ -39,6 +40,7 @@ class _NameCaptureScreenState extends State<NameCaptureScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = stringsOf(context);
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: AppBackground(
@@ -61,10 +63,10 @@ class _NameCaptureScreenState extends State<NameCaptureScreen> {
                   children: [
                     const Mascot(size: 64),
                     const SizedBox(height: 12),
-                    const Text(
-                      'Qual é o seu nome?',
+                    Text(
+                      t.nameCaptureTitle,
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.textDark),
+                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.textDark),
                     ),
                     const SizedBox(height: 20),
                     TextField(
@@ -76,7 +78,7 @@ class _NameCaptureScreenState extends State<NameCaptureScreen> {
                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textDark),
                       decoration: InputDecoration(
                         counterText: '',
-                        hintText: 'Digite seu nome',
+                        hintText: t.nameCaptureHint,
                         filled: true,
                         fillColor: const Color(0xFFEFE9FF),
                         border: OutlineInputBorder(
@@ -96,10 +98,10 @@ class _NameCaptureScreenState extends State<NameCaptureScreen> {
                         borderRadius: 999,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         onTap: _confirm,
-                        child: const Center(
+                        child: Center(
                           child: Text(
-                            'CONTINUAR',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                            t.continueLabel,
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                           ),
                         ),
                       ),

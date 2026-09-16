@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../l10n/app_strings.dart';
 import '../../models/age_group.dart';
 import '../../services/music_service.dart';
 import '../../services/tts_service.dart';
@@ -10,9 +11,6 @@ import '../../widgets/end_game_dialog.dart';
 import '../../widgets/game_top_bar.dart';
 import '../../widgets/squishy_button.dart';
 import 'drawings.dart';
-
-const _choosePrompt = 'Escolha um desenho para pintar';
-const _paintPrompt = 'Toque nas partes do desenho para escolher a cor';
 
 const _paintColors = <Color>[
   Color(0xFFEF5350),
@@ -44,7 +42,7 @@ class _PintarScreenState extends State<PintarScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _speak(_choosePrompt));
+    WidgetsBinding.instance.addPostFrameCallback((_) => _speak(stringsOf(context).pintarChoosePrompt));
   }
 
   void _speak(String text) {
@@ -64,7 +62,7 @@ class _PintarScreenState extends State<PintarScreen> {
       selected = d;
       partColors = List<Color?>.filled(d.parts.length, null);
     });
-    _speak(_paintPrompt);
+    _speak(stringsOf(context).pintarPaintPrompt);
   }
 
   void _finish() {
@@ -83,6 +81,7 @@ class _PintarScreenState extends State<PintarScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = stringsOf(context);
     if (selected == null) {
       final options = drawingsForAge(widget.age);
       return Scaffold(
@@ -95,10 +94,10 @@ class _PintarScreenState extends State<PintarScreen> {
                 children: [
                   const GameTopBar(),
                   const SizedBox(height: 12),
-                  const Text(
-                    'Escolha um desenho para pintar',
+                  Text(
+                    t.pintarChoosePrompt,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -126,7 +125,7 @@ class _PintarScreenState extends State<PintarScreen> {
                               Text(d.emoji, style: const TextStyle(fontSize: 40)),
                               const SizedBox(height: 8),
                               Text(
-                                d.title,
+                                t.drawingTitle(d.id),
                                 style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textDark),
                               ),
                             ],
@@ -153,7 +152,7 @@ class _PintarScreenState extends State<PintarScreen> {
             child: Column(
               children: [
                 GameTopBar(
-                  progressLabel: drawing.title,
+                  progressLabel: t.drawingTitle(drawing.id),
                   onBack: () => setState(() => selected = null),
                 ),
                 Expanded(
@@ -218,10 +217,10 @@ class _PintarScreenState extends State<PintarScreen> {
                     borderRadius: 999,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     onTap: _finish,
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        'PRONTO!',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                        t.pintarDone,
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                       ),
                     ),
                   ),

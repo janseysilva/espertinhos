@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../l10n/app_strings.dart';
 import '../../models/age_group.dart';
 import '../../services/music_service.dart';
 import '../../services/tts_service.dart';
@@ -11,8 +12,6 @@ import '../../widgets/app_background.dart';
 import '../../widgets/end_game_dialog.dart';
 import '../../widgets/game_top_bar.dart';
 import '../pintar/drawings.dart';
-
-const _quebraCabecaPrompt = 'Toque em 2 peças para trocar de lugar';
 
 int _minSwapsToSort(List<int> perm) {
   final n = perm.length;
@@ -62,7 +61,7 @@ class _QuebraCabecaScreenState extends State<QuebraCabecaScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (context.read<MusicService>().muted) return;
-      context.read<TtsService>().speak(_quebraCabecaPrompt);
+      context.read<TtsService>().speak(stringsOf(context).quebraCabecaPrompt);
     });
   }
 
@@ -125,6 +124,7 @@ class _QuebraCabecaScreenState extends State<QuebraCabecaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = stringsOf(context);
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: AppBackground(
@@ -133,12 +133,12 @@ class _QuebraCabecaScreenState extends State<QuebraCabecaScreen> {
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
             child: Column(
               children: [
-                GameTopBar(progressLabel: 'Trocas: $swaps'),
+                GameTopBar(progressLabel: t.quebraCabecaSwaps(swaps)),
                 const SizedBox(height: 8),
-                const Text(
-                  'Toque em 2 peças para trocar de lugar',
+                Text(
+                  t.quebraCabecaPrompt,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -203,9 +203,9 @@ class _QuebraCabecaScreenState extends State<QuebraCabecaScreen> {
                   ),
                 ),
                 const SizedBox(height: 14),
-                const Text(
-                  'Assim vai ficar:',
-                  style: TextStyle(
+                Text(
+                  t.quebraCabecaPreview,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 13,

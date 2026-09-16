@@ -15,9 +15,25 @@ class TtsService {
   bool _ready = false;
   Map<String, String>? _selectedVoice;
   String? _selectedEngine;
+  String _locale = 'pt-BR';
 
   Map<String, String>? get selectedVoice => _selectedVoice;
   String? get selectedEngine => _selectedEngine;
+
+  /// Troca o idioma que o motor de TTS fala — chamado assim que o idioma do
+  /// app é escolhido/trocado (ver [AppState.language]). A seleção de voz
+  /// específica só existe pro português do Brasil (ver [listPortugueseVoices]);
+  /// nos outros idiomas o app usa a voz padrão do aparelho pra esse idioma.
+  Future<void> setAppLocale(String localeCode) async {
+    await _ensureReady();
+    _locale = localeCode;
+    try {
+      await _tts.setLanguage(_locale);
+    } catch (_) {
+      // Aparelho pode não ter esse idioma instalado — fala fica muda,
+      // sem travar o app (mesmo padrão de falha silenciosa dos outros métodos).
+    }
+  }
 
   /// Prepara o motor de TTS assim que o app abre, em vez de deixar pra
   /// primeira fala de verdade — sem isso, a fala da fase 1 demorava alguns
@@ -30,7 +46,7 @@ class TtsService {
     _ready = true;
     try {
       await _loadSavedEngine();
-      await _tts.setLanguage('pt-BR');
+      await _tts.setLanguage(_locale);
       await _tts.setSpeechRate(0.42);
       await _tts.setPitch(1.15);
       await _tts.awaitSpeakCompletion(true);
@@ -78,7 +94,7 @@ class TtsService {
     } else {
       try {
         await _tts.setEngine(engine);
-        await _tts.setLanguage('pt-BR');
+        await _tts.setLanguage(_locale);
         await _tts.setSpeechRate(0.42);
         await _tts.setPitch(1.15);
       } catch (_) {}

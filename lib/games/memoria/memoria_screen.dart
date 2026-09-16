@@ -3,14 +3,13 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../l10n/app_strings.dart';
 import '../../models/age_group.dart';
 import '../../services/music_service.dart';
 import '../../services/tts_service.dart';
 import '../../widgets/app_background.dart';
 import '../../widgets/end_game_dialog.dart';
 import '../../widgets/game_top_bar.dart';
-
-const _memoriaPrompt = 'Toque em 2 cartas para achar os pares iguais';
 
 const _animalPool = [
   '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼',
@@ -43,7 +42,7 @@ class _MemoriaScreenState extends State<MemoriaScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (context.read<MusicService>().muted) return;
-      context.read<TtsService>().speak(_memoriaPrompt);
+      context.read<TtsService>().speak(stringsOf(context).memoriaPrompt);
     });
   }
 
@@ -119,12 +118,12 @@ class _MemoriaScreenState extends State<MemoriaScreen> {
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
             child: Column(
               children: [
-                GameTopBar(progressLabel: 'Jogadas: $moves'),
+                GameTopBar(progressLabel: stringsOf(context).memoriaMoves(moves)),
                 const SizedBox(height: 12),
-                const Text(
-                  _memoriaPrompt,
+                Text(
+                  stringsOf(context).memoriaPrompt,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_strings.dart';
 import '../../models/age_group.dart';
 import '../../widgets/choice_game_scaffold.dart';
 
@@ -14,6 +15,7 @@ class MatematicaScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = stringsOf(context);
     final maxSum = switch (age.level) { 0 => 5, 1 => 9, _ => 20 };
     final allowSubtraction = age.level >= 1;
     final useIcons = age.level <= 1;
@@ -81,7 +83,7 @@ class MatematicaScreen extends StatelessWidget {
 
         return RoundData(
           prompt: prompt,
-          promptText: 'Quanto é $a ${isSubtraction ? "menos" : "mais"} $b?',
+          promptText: t.matematicaPrompt(a, b, isSubtraction),
           options: choices
               .map(
                 (n) => ChoiceOption(

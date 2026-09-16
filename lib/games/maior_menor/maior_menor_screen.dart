@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_strings.dart';
 import '../../models/age_group.dart';
 import '../../widgets/choice_game_scaffold.dart';
 
@@ -12,6 +13,7 @@ class MaiorMenorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = stringsOf(context);
     final maxN = switch (age.level) { 0 => 10, 1 => 30, _ => 100 };
     // Guarda os pares de números já perguntados nessa partida, pra nunca
     // repetir a mesma dupla em rodadas diferentes.
@@ -38,7 +40,7 @@ class MaiorMenorScreen extends StatelessWidget {
         usedPairs.add((min(a, b), max(a, b)));
         final correct = askBigger ? max(a, b) : min(a, b);
 
-        final text = askBigger ? 'Toque no número MAIOR' : 'Toque no número MENOR';
+        final text = t.maiorMenorPrompt(askBigger);
         return RoundData(
           prompt: Text(
             text,

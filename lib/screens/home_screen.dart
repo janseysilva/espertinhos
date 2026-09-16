@@ -18,7 +18,9 @@ import '../games/pintar/pintar_screen.dart';
 import '../games/quebra_cabeca/quebra_cabeca_screen.dart';
 import '../games/sequencia/sequencia_screen.dart';
 import '../games/sons_bichos/sons_bichos_screen.dart';
+import '../l10n/app_strings.dart';
 import '../models/age_group.dart';
+import '../models/app_language.dart';
 import '../models/game_def.dart';
 import '../models/game_order.dart';
 import '../services/app_state.dart';
@@ -170,18 +172,17 @@ class HomeScreen extends StatelessWidget {
   }
 
   Future<void> _resetPhases(BuildContext context) async {
+    final t = stringsOf(context);
     final ok = await showAdminLockDialog(context);
     if (!ok || !context.mounted) return;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Resetar fases?'),
-        content: const Text(
-          'Isso apaga o progresso de fases da faixa etária atual, voltando pra fase 1. Não dá pra desfazer.',
-        ),
+        title: Text(t.resetPhasesDialogTitle),
+        content: Text(t.resetPhasesDialogContent),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Resetar')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(t.cancelLabel)),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(t.resetConfirmLabel)),
         ],
       ),
     );
@@ -189,17 +190,18 @@ class HomeScreen extends StatelessWidget {
     await context.read<AppState>().resetPhaseProgress();
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Fases resetadas!'), behavior: SnackBarBehavior.floating),
+        SnackBar(content: Text(t.resetPhasesSnackbar), behavior: SnackBarBehavior.floating),
       );
     }
   }
 
   Future<void> _buyRemoveAds(BuildContext context) async {
+    final t = stringsOf(context);
     final purchases = context.read<PurchaseService>();
     if (!purchases.productAvailable) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('A compra ainda não está disponível na loja. Tente de novo mais tarde!'),
+        SnackBar(
+          content: Text(t.purchaseNotAvailable),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -213,6 +215,7 @@ class HomeScreen extends StatelessWidget {
     final appState = context.watch<AppState>();
     final age = appState.ageGroup ?? AgeGroup.faixa5a6;
     final purchases = context.watch<PurchaseService>();
+    final t = stringsOf(context);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -252,7 +255,7 @@ class HomeScreen extends StatelessWidget {
                           Text(age.emoji, style: const TextStyle(fontSize: 14)),
                           const SizedBox(width: 6),
                           Text(
-                            '${age.label} · trocar',
+                            '${t.ageLabel(age)} ${t.changeAgeSuffix}',
                             style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent, fontSize: 12),
                           ),
                         ],
@@ -263,14 +266,14 @@ class HomeScreen extends StatelessWidget {
                       borderRadius: 999,
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                       onTap: () => _resetPhases(context),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text('🔄', style: TextStyle(fontSize: 14)),
-                          SizedBox(width: 6),
+                          const Text('🔄', style: TextStyle(fontSize: 14)),
+                          const SizedBox(width: 6),
                           Text(
-                            'Resetar fases',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent, fontSize: 12),
+                            t.resetPhasesLabel,
+                            style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent, fontSize: 12),
                           ),
                         ],
                       ),
@@ -287,9 +290,7 @@ class HomeScreen extends StatelessWidget {
                             const Text('🚫', style: TextStyle(fontSize: 14)),
                             const SizedBox(width: 6),
                             Text(
-                              purchases.busy
-                                  ? 'Comprando...'
-                                  : 'Remover anúncios${purchases.priceLabel.isNotEmpty ? ' · ${purchases.priceLabel}' : ''}',
+                              t.removeAdsLabel(buying: purchases.busy, priceLabel: purchases.priceLabel),
                               style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent, fontSize: 12),
                             ),
                           ],
@@ -316,12 +317,12 @@ class HomeScreen extends StatelessWidget {
                         game: game,
                         index: i,
                         unlocked: unlocked,
-                        badgeLabel: isSpecial ? '★ ESPECIAL' : null,
+                        badgeLabel: isSpecial ? t.badgeSpecial : null,
                         onTap: () {
                           if (!unlocked) {
                             final message = isSpecial
-                                ? '🔒 Junte ${AppState.specialGameStarsGoal} estrelas vitalícias pra desbloquear esse jogo especial!'
-                                : '🔒 Consiga ${age.starsToAdvance} estrelas na fase anterior pra desbloquear essa!';
+                                ? t.specialLockedSnackbar(AppState.specialGameStarsGoal)
+                                : t.lockedSnackbar(age.starsToAdvance);
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
                             );
@@ -339,27 +340,32 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-            Align(
-              alignment: Alignment.topRight,
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 100, right: 12),
-                  child: Material(
-                    color: Colors.white.withValues(alpha: 0.85),
-                    shape: const CircleBorder(),
-                    elevation: 3,
-                    child: InkWell(
-                      customBorder: const CircleBorder(),
-                      onTap: () => showVoiceSettingsDialog(context, context.read<TtsService>()),
-                      child: const Padding(
-                        padding: EdgeInsets.all(9),
-                        child: Text('🗣️', style: TextStyle(fontSize: 18)),
+            // Seletor de voz só faz sentido pro português do Brasil — é onde
+            // o app lista/deixa escolher entre as vozes pt-BR instaladas no
+            // aparelho (ver TtsService.listPortugueseVoices). Nos outros
+            // idiomas o TTS já usa a voz padrão do sistema pra esse idioma.
+            if (appState.language == null || appState.language == AppLanguage.ptBr)
+              Align(
+                alignment: Alignment.topRight,
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 100, right: 12),
+                    child: Material(
+                      color: Colors.white.withValues(alpha: 0.85),
+                      shape: const CircleBorder(),
+                      elevation: 3,
+                      child: InkWell(
+                        customBorder: const CircleBorder(),
+                        onTap: () => showVoiceSettingsDialog(context, context.read<TtsService>()),
+                        child: const Padding(
+                          padding: EdgeInsets.all(9),
+                          child: Text('🗣️', style: TextStyle(fontSize: 18)),
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
       ),
@@ -388,6 +394,7 @@ class _GameTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = stringsOf(context);
     return SquishyButton(
       borderRadius: 22,
       onTap: onTap,
@@ -406,7 +413,7 @@ class _GameTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(999),
               ),
               child: Text(
-                badgeLabel ?? 'FASE ${index + 1}',
+                badgeLabel ?? t.badgePhase(index + 1),
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
@@ -421,7 +428,7 @@ class _GameTile extends StatelessWidget {
                 : Icon(Icons.lock_rounded, size: 34, color: Colors.grey.shade500),
             const SizedBox(height: 8),
             Text(
-              game.title,
+              t.gameTitle(game.id),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontWeight: FontWeight.bold,

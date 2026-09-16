@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_strings.dart';
 import '../../models/age_group.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/choice_game_scaffold.dart';
@@ -13,6 +14,7 @@ class SequenciaScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = stringsOf(context);
     final palette = switch (age.level) {
       0 => AppColors.palette.take(3).toList(),
       1 => AppColors.palette.take(4).toList(),
@@ -55,9 +57,9 @@ class SequenciaScreen extends StatelessWidget {
         return RoundData(
           prompt: Column(
             children: [
-              const Text(
-                'Qual cor vem a seguir?',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+              Text(
+                t.sequenciaPrompt,
+                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 16),
               Wrap(
@@ -71,7 +73,7 @@ class SequenciaScreen extends StatelessWidget {
               ),
             ],
           ),
-          promptText: 'Qual cor vem a seguir?',
+          promptText: t.sequenciaPrompt,
           options: options
               .map((c) => ChoiceOption(isCorrect: c == next, child: _Dot(color: c, size: 48)))
               .toList(),

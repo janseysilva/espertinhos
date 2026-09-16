@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_strings.dart';
 import '../theme/app_theme.dart';
 import 'squishy_button.dart';
 
@@ -34,9 +35,9 @@ class GameTopBar extends StatelessWidget {
               borderRadius: 999,
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
               onTap: onBack ?? () => Navigator.of(context).pop(),
-              child: const Text(
-                '← Voltar',
-                style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textDark, fontSize: 14),
+              child: Text(
+                stringsOf(context).backLabel,
+                style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textDark, fontSize: 14),
               ),
             ),
           ],

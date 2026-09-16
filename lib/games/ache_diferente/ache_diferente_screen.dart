@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_strings.dart';
 import '../../models/age_group.dart';
 import '../../widgets/choice_game_scaffold.dart';
 
@@ -17,6 +18,7 @@ class AcheDiferenteScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = stringsOf(context);
     final gridSize = switch (age.level) { 0 => 6, 1 => 9, _ => 12 };
     final crossAxisCount = switch (age.level) { 0 => 3, 1 => 3, _ => 4 };
     // Guarda os pares (ícone comum, ícone diferente) já perguntados nessa
@@ -43,12 +45,12 @@ class AcheDiferenteScreen extends StatelessWidget {
         final oddIndex = random.nextInt(gridSize);
 
         return RoundData(
-          prompt: const Text(
-            'Toque no que é diferente',
+          prompt: Text(
+            t.acheDiferentePrompt,
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
           ),
-          promptText: 'Toque no que é diferente',
+          promptText: t.acheDiferentePrompt,
           options: List.generate(
             gridSize,
             (i) => ChoiceOption(

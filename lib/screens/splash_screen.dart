@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../models/app_language.dart';
 import '../services/app_state.dart';
 import '../services/music_service.dart';
+import '../services/tts_service.dart';
 import '../widgets/app_background.dart';
 import '../widgets/mascot.dart';
 import 'age_select_screen.dart';
 import 'home_screen.dart';
+import 'language_select_screen.dart';
 import 'name_capture_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -31,9 +34,14 @@ class _SplashScreenState extends State<SplashScreen> {
       Future.delayed(const Duration(milliseconds: 1300)),
     ]);
     if (!mounted) return;
+    if (appState.language != null) {
+      await context.read<TtsService>().setAppLocale(appState.language!.ttsLocale);
+    }
+    if (!mounted) return;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) {
+          if (appState.language == null) return const LanguageSelectScreen();
           if (appState.childName == null) return const NameCaptureScreen();
           if (appState.ageGroup == null) return const AgeSelectScreen();
           return const HomeScreen();

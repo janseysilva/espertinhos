@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_strings.dart';
 import '../../models/age_group.dart';
 import '../../models/game_order.dart';
 import '../../widgets/choice_game_scaffold.dart';
@@ -19,20 +20,6 @@ const _emoji = {
   _Membro.cachorro: '🐶',
 };
 
-const _nomes = {
-  _Membro.mamae: 'Mamãe',
-  _Membro.papai: 'Papai',
-  _Membro.bebe: 'Bebê',
-  _Membro.avoF: 'Vovó',
-  _Membro.avoM: 'Vovô',
-  _Membro.irma: 'Irmã',
-  _Membro.irmao: 'Irmão',
-  _Membro.cachorro: 'Cachorro',
-};
-
-// "no" (masculino) por padrão; só mamãe/vovó/irmã usam "na" (feminino).
-const _feminino = {_Membro.mamae, _Membro.avoF, _Membro.irma};
-
 /// Jogo especial — só é jogável depois que a criança acumular estrelas
 /// vitalícias suficientes (ver [AppState.isUnlocked]), não faz parte da
 /// sequência normal de fases.
@@ -43,6 +30,7 @@ class FamiliaScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = stringsOf(context);
     // Precisa de pelo menos tantos membros quanto rodadas na partida
     // (age.starsToAdvance: 5/6/8), senão não dá pra evitar repetir a
     // mesma pergunta na faixa mais nova.
@@ -72,8 +60,7 @@ class FamiliaScreen extends StatelessWidget {
         }
         final options = chosen.toList()..shuffle(random);
 
-        final article = _feminino.contains(target) ? 'na' : 'no';
-        final text = 'Toque $article ${_nomes[target]}';
+        final text = t.familiaPrompt(target.name);
         return RoundData(
           prompt: Text(
             text,

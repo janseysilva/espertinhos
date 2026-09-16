@@ -4,6 +4,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../l10n/app_strings.dart';
 import '../../models/age_group.dart';
 import '../../models/scoring.dart';
 import '../../services/music_service.dart';
@@ -27,19 +28,6 @@ const _animalEmoji = {
   _Animal.ovelha: '🐑',
   _Animal.porco: '🐷',
   _Animal.elefante: '🐘',
-};
-
-const _animalNames = {
-  _Animal.cachorro: 'Cachorro',
-  _Animal.gato: 'Gato',
-  _Animal.vaca: 'Vaca',
-  _Animal.pato: 'Pato',
-  _Animal.galo: 'Galo',
-  _Animal.leao: 'Leão',
-  _Animal.cavalo: 'Cavalo',
-  _Animal.ovelha: 'Ovelha',
-  _Animal.porco: 'Porco',
-  _Animal.elefante: 'Elefante',
 };
 
 const _animalAsset = {
@@ -160,6 +148,7 @@ class _SonsBichosScreenState extends State<SonsBichosScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = stringsOf(context);
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: AppBackground(
@@ -175,10 +164,10 @@ class _SonsBichosScreenState extends State<SonsBichosScreen> {
                       progress: (round + 1) / totalRounds,
                     ),
                     const SizedBox(height: 14),
-                    const Text(
-                      'Que bicho fez esse som?',
+                    Text(
+                      t.sonsBichosPrompt,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -191,14 +180,14 @@ class _SonsBichosScreenState extends State<SonsBichosScreen> {
                       borderRadius: 999,
                       padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
                       onTap: _playSound,
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.volume_up_rounded, color: AppColors.accent, size: 24),
-                          SizedBox(width: 8),
+                          const Icon(Icons.volume_up_rounded, color: AppColors.accent, size: 24),
+                          const SizedBox(width: 8),
                           Text(
-                            'Ouvir de novo',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent, fontSize: 15),
+                            t.sonsBichosListenAgain,
+                            style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent, fontSize: 15),
                           ),
                         ],
                       ),
@@ -225,7 +214,7 @@ class _SonsBichosScreenState extends State<SonsBichosScreen> {
                                   Text(_animalEmoji[animal]!, style: const TextStyle(fontSize: 40)),
                                   const SizedBox(height: 6),
                                   Text(
-                                    _animalNames[animal]!,
+                                    t.animalName(animal.name),
                                     style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textDark, fontSize: 14),
                                   ),
                                 ],

@@ -2,23 +2,11 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_strings.dart';
 import '../../models/age_group.dart';
 import '../../widgets/choice_game_scaffold.dart';
 
 enum _Shape { circulo, quadrado, triangulo, estrela, coracao, losango }
-
-const _shapeNames = {
-  _Shape.circulo: 'círculo',
-  _Shape.quadrado: 'quadrado',
-  _Shape.triangulo: 'triângulo',
-  _Shape.estrela: 'estrela',
-  _Shape.coracao: 'coração',
-  _Shape.losango: 'losango',
-};
-
-// "estrela" é a única forma feminina da lista ("na estrela"); as demais
-// são masculinas ("no círculo", "no quadrado" etc).
-const _feminineShapes = {_Shape.estrela};
 
 const _colors = <String, Color>{
   'vermelho': Color(0xFFEF5350),
@@ -29,15 +17,6 @@ const _colors = <String, Color>{
   'laranja': Color(0xFFFF7043),
 };
 
-// Forma feminina de cada cor, pra concordar com formas femininas (ex:
-// "estrela vermelha"). Cores sem entrada aqui (azul/verde/laranja) são
-// invariáveis, o nome já serve pros dois gêneros.
-const _feminineColorNames = {
-  'vermelho': 'vermelha',
-  'amarelo': 'amarela',
-  'roxo': 'roxa',
-};
-
 class CoresFormasScreen extends StatelessWidget {
   const CoresFormasScreen({super.key, required this.age});
 
@@ -45,6 +24,7 @@ class CoresFormasScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = stringsOf(context);
     final shapeCount = switch (age.level) { 0 => 3, 1 => 4, _ => 6 };
     final colorCount = switch (age.level) { 0 => 3, 1 => 4, _ => 6 };
     final optionCount = switch (age.level) { 0 => 4, 1 => 6, _ => 8 };
@@ -79,10 +59,7 @@ class CoresFormasScreen extends StatelessWidget {
         }
         final options = combos.toList()..shuffle(random);
 
-        final isFeminine = _feminineShapes.contains(targetShape);
-        final article = isFeminine ? 'na' : 'no';
-        final colorLabel = isFeminine ? (_feminineColorNames[targetColor] ?? targetColor) : targetColor;
-        final text = 'Toque $article ${_shapeNames[targetShape]} $colorLabel';
+        final text = t.coresFormasPrompt(targetShape.name, targetColor);
         return RoundData(
           prompt: Text(
             text,

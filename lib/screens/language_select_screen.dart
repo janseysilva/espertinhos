@@ -2,22 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../l10n/app_strings.dart';
-import '../models/age_group.dart';
+import '../models/app_language.dart';
 import '../services/app_state.dart';
+import '../services/tts_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_background.dart';
 import '../widgets/mascot.dart';
 import '../widgets/squishy_button.dart';
-import 'home_screen.dart';
+import 'age_select_screen.dart';
+import 'name_capture_screen.dart';
 
-class AgeSelectScreen extends StatelessWidget {
-  const AgeSelectScreen({super.key});
+/// Primeira tela que a criança/responsável vê, só na primeira vez que abre
+/// o app — escolhe o idioma que o app inteiro (jogos + narração por voz) vai
+/// usar dali pra frente. Como ainda não sabemos que idioma a pessoa fala, o
+/// título e os nomes de cada opção aparecem no próprio idioma deles
+/// (autônimo), não traduzidos.
+class LanguageSelectScreen extends StatelessWidget {
+  const LanguageSelectScreen({super.key});
 
-  Future<void> _choose(BuildContext context, AgeGroup age) async {
-    await context.read<AppState>().setAgeGroup(age);
+  Future<void> _choose(BuildContext context, AppLanguage language) async {
+    final appState = context.read<AppState>();
+    final tts = context.read<TtsService>();
+    await appState.setLanguage(language);
+    if (!context.mounted) return;
+    await tts.setAppLocale(language.ttsLocale);
     if (!context.mounted) return;
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
+      MaterialPageRoute(
+        builder: (_) => appState.childName == null ? const NameCaptureScreen() : const AgeSelectScreen(),
+      ),
     );
   }
 
@@ -47,17 +60,17 @@ class AgeSelectScreen extends StatelessWidget {
                     const Mascot(size: 64),
                     const SizedBox(height: 12),
                     Text(
-                      t.ageSelectTitle,
+                      t.chooseLanguageTitle,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.textDark),
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textDark),
                     ),
                     const SizedBox(height: 20),
                     Wrap(
                       alignment: WrapAlignment.center,
                       spacing: 12,
                       runSpacing: 12,
-                      children: AgeGroup.values
-                          .map((age) => _AgeCard(age: age, label: t.ageLabel(age), onTap: () => _choose(context, age)))
+                      children: AppLanguage.values
+                          .map((lang) => _LanguageCard(language: lang, onTap: () => _choose(context, lang)))
                           .toList(),
                     ),
                   ],
@@ -71,11 +84,10 @@ class AgeSelectScreen extends StatelessWidget {
   }
 }
 
-class _AgeCard extends StatelessWidget {
-  const _AgeCard({required this.age, required this.label, required this.onTap});
+class _LanguageCard extends StatelessWidget {
+  const _LanguageCard({required this.language, required this.onTap});
 
-  final AgeGroup age;
-  final String label;
+  final AppLanguage language;
   final VoidCallback onTap;
 
   @override
@@ -88,10 +100,10 @@ class _AgeCard extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(age.emoji, style: const TextStyle(fontSize: 38)),
+          Text(language.flag, style: const TextStyle(fontSize: 38)),
           const SizedBox(height: 8),
           Text(
-            label,
+            language.nativeName,
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.textDark),
           ),

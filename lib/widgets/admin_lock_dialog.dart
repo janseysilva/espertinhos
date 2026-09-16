@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../l10n/app_strings.dart';
 import '../theme/app_theme.dart';
 import 'squishy_button.dart';
 
@@ -9,6 +10,7 @@ import 'squishy_button.dart';
 /// de múltipla escolha (em vez de campo de texto — mais confiável em
 /// touch, e é o padrão já validado na versão HTML).
 Future<bool> showAdminLockDialog(BuildContext context) async {
+  final t = stringsOf(context);
   final random = Random();
   final a = random.nextInt(60) + 20;
   final b = random.nextInt(30) + 10;
@@ -39,14 +41,14 @@ Future<bool> showAdminLockDialog(BuildContext context) async {
           children: [
             const Text('🔒', style: TextStyle(fontSize: 40)),
             const SizedBox(height: 10),
-            const Text(
-              'Pergunta para\no responsável',
+            Text(
+              t.adminLockQuestion,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textDark),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textDark),
             ),
             const SizedBox(height: 16),
             Text(
-              'Quanto é $a + $b?',
+              t.adminLockMath(a, b),
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.accent),
             ),
             const SizedBox(height: 16),
@@ -71,7 +73,7 @@ Future<bool> showAdminLockDialog(BuildContext context) async {
             const SizedBox(height: 12),
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancelar'),
+              child: Text(t.cancelLabel),
             ),
           ],
         ),

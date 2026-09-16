@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../l10n/app_strings.dart';
 import '../../models/age_group.dart';
 import '../../services/music_service.dart';
 import '../../services/tts_service.dart';
@@ -10,8 +11,6 @@ import '../../theme/app_theme.dart';
 import '../../widgets/app_background.dart';
 import '../../widgets/end_game_dialog.dart';
 import '../../widgets/game_top_bar.dart';
-
-const _labirintoPrompt = 'Leve o coelhinho até a bandeira';
 
 class _Cell {
   bool up = false;
@@ -109,7 +108,7 @@ class _LabirintoScreenState extends State<LabirintoScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (context.read<MusicService>().muted) return;
-      context.read<TtsService>().speak(_labirintoPrompt);
+      context.read<TtsService>().speak(stringsOf(context).labirintoPrompt);
     });
   }
 
@@ -151,6 +150,7 @@ class _LabirintoScreenState extends State<LabirintoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = stringsOf(context);
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: AppBackground(
@@ -161,10 +161,10 @@ class _LabirintoScreenState extends State<LabirintoScreen> {
               children: [
                 GameTopBar(progressLabel: '${round + 1} / $totalRounds', progress: (round + 1) / totalRounds),
                 const SizedBox(height: 8),
-                const Text(
-                  'Leve o coelhinho até a bandeira',
+                Text(
+                  t.labirintoPrompt,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

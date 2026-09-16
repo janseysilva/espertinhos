@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../l10n/app_strings.dart';
 import '../../models/age_group.dart';
 import '../../models/scoring.dart';
 import '../../services/music_service.dart';
@@ -13,11 +14,6 @@ import '../../widgets/end_game_dialog.dart';
 import '../../widgets/feedback_flash.dart';
 import '../../widgets/game_top_bar.dart';
 import 'word_search_generator.dart';
-
-const _pool2a4 = ['GATO', 'SOL', 'LUA', 'PATO', 'MESA', 'BOLA', 'RATO', 'CASA'];
-const _pool5a6 = ['FLOR', 'LIVRO', 'PORTA', 'PEIXE', 'URSO', 'LEAO', 'NUVEM', 'CHUVA'];
-const _pool7a8 = ['ESTRELA', 'MONTANHA', 'JARDIM', 'FLORESTA', 'GIRASSOL', 'ELEFANTE', 'FAMILIA', 'CACHORRO'];
-const _cacaPalavrasPrompt = 'Toque na primeira e na última letra da palavra';
 
 class CacaPalavrasScreen extends StatefulWidget {
   const CacaPalavrasScreen({super.key, required this.age});
@@ -41,7 +37,7 @@ class _CacaPalavrasScreenState extends State<CacaPalavrasScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (context.read<MusicService>().muted) return;
-      context.read<TtsService>().speak(_cacaPalavrasPrompt);
+      context.read<TtsService>().speak(stringsOf(context).cacaPalavrasPrompt);
     });
   }
 
@@ -52,10 +48,11 @@ class _CacaPalavrasScreenState extends State<CacaPalavrasScreen> {
   }
 
   void _setup() {
-    final (n, wordCount, allowDiagonal, pool) = switch (widget.age.level) {
-      0 => (6, 3, false, _pool2a4),
-      1 => (8, 4, true, _pool5a6),
-      _ => (10, 5, true, _pool7a8),
+    final pool = stringsOf(context).cacaPalavrasPool(widget.age.level);
+    final (n, wordCount, allowDiagonal) = switch (widget.age.level) {
+      0 => (6, 3, false),
+      1 => (8, 4, true),
+      _ => (10, 5, true),
     };
     final chosen = (List<String>.from(pool)..shuffle()).take(wordCount).toList();
     puzzle = generateWordSearch(n: n, words: chosen, allowDiagonal: allowDiagonal);
@@ -164,10 +161,10 @@ class _CacaPalavrasScreenState extends State<CacaPalavrasScreen> {
                   children: [
                     GameTopBar(progressLabel: '$foundCount/${puzzle.words.length}'),
                     const SizedBox(height: 8),
-                    const Text(
-                      _cacaPalavrasPrompt,
+                    Text(
+                      stringsOf(context).cacaPalavrasPrompt,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 15,
                         fontWeight: FontWeight.bold,

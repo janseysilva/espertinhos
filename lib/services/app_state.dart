@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../models/age_group.dart';
+import '../models/app_language.dart';
 import '../models/game_order.dart';
 import 'auth_service.dart';
 import 'local_progress_store.dart';
@@ -12,6 +13,7 @@ class AppState extends ChangeNotifier {
   String? uid;
   String? childName;
   AgeGroup? ageGroup;
+  AppLanguage? language;
   bool initialized = false;
   bool offline = false;
   int unlockedPhase = 1;
@@ -23,6 +25,7 @@ class AppState extends ChangeNotifier {
   /// aparelho (instantâneo, sem rede) — a nuvem conecta em segundo plano
   /// só pro contador de estrelas vitalício e como cópia de segurança.
   Future<void> init() async {
+    language = await _local.loadLanguage();
     childName = await _local.loadChildName();
     ageGroup = await _local.loadAgeGroup();
     if (ageGroup != null) {
@@ -32,6 +35,12 @@ class AppState extends ChangeNotifier {
     initialized = true;
     notifyListeners();
     unawaited(_connectCloud());
+  }
+
+  Future<void> setLanguage(AppLanguage lang) async {
+    language = lang;
+    notifyListeners();
+    await _local.saveLanguage(lang);
   }
 
   Future<void> setChildName(String name) async {
