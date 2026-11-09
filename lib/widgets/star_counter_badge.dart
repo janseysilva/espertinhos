@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/app_strings.dart';
 import '../services/app_state.dart';
 import '../theme/app_theme.dart';
 
@@ -26,7 +27,8 @@ class StarCounterBadge extends StatelessWidget {
             const Icon(Icons.star_rounded, color: AppColors.starOn, size: 15),
             const SizedBox(width: 4),
             Text(
-              '$total de 1000',
+              stringsOf(context)
+                  .starCounter(total, AppState.specialGameStarsGoal),
               style: const TextStyle(
                 fontWeight: FontWeight.w700,
                 color: AppColors.textDark,

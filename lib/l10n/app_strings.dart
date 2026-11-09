@@ -328,6 +328,13 @@ class AppStrings {
         AppLanguage.es => '$stars de $maxStars estrellas',
       };
 
+  /// Contador de estrelas vitalícias (balão do canto superior direito).
+  String starCounter(int total, int goal) => switch (lang) {
+        AppLanguage.ptBr || AppLanguage.ptPt => '$total de $goal',
+        AppLanguage.en => '$total of $goal',
+        AppLanguage.es => '$total de $goal',
+      };
+
   String get waitingAd => switch (lang) {
         AppLanguage.ptBr || AppLanguage.ptPt => 'Aguardando anúncio...',
         AppLanguage.en => 'Waiting for ad...',
