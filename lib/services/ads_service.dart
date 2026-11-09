@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 /// ID real do bloco de anúncios intersticial (conta AdMob do Jansey).
-const _interstitialUnitId = 'ca-app-pub-1435621547457341/9080254954';
+const _interstitialUnitId = 'ca-app-pub-1435621547457341/5919556332';
 
 /// Anúncio de tela inteira mostrado em pontos de pausa natural (ex: ao
 /// voltar pro menu depois de um jogo) — nunca no meio da brincadeira.
